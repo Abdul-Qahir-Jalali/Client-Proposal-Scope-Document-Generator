@@ -1,10 +1,12 @@
+import re
 from datetime import date
 from io import BytesIO
+from pathlib import Path
 
 import pytest
 from docx import Document
 
-from proposal import docx_export, generator as gen, render
+from proposal import docx_export, generator as gen, pdf_export, render
 
 SAMPLES = gen.load_samples()
 TODAY = date(2026, 1, 5)
@@ -104,6 +106,109 @@ def test_summary_reads_naturally():
     p = gen.build_proposal(SAMPLES[next(iter(SAMPLES))], TODAY)
     assert "a website redesign for Bright Dental Clinic over 8 weeks" in p["summary"]
     assert "$6,500 – $8,000" in p["summary"]
+
+
+@pytest.mark.parametrize("text,expected", [
+    ("$6,500 (50% upfront)", (6500, 6500)),
+    ("$4,000 per month for 3 months", (4000, 4000)),
+    ("$3,000 - $5,000 over 8 weeks", (3000, 5000)),
+])
+def test_parse_money_ignores_non_money_numbers(text, expected):
+    assert gen.parse_money(text)[:2] == expected
+
+
+@pytest.mark.parametrize("low,high,expected", [
+    (float("nan"), float("nan"), (0, 0)),
+    (500, float("nan"), (500, 500)),
+    (float("nan"), 700, (700, 700)),
+    (900, 400, (900, 900)),
+    (None, None, (0, 0)),
+])
+def test_clean_amounts(low, high, expected):
+    assert gen.clean_amounts(low, high) == expected
+
+
+def test_totals_and_render_survive_blank_price_cells():
+    p = gen.build_proposal(SAMPLES[next(iter(SAMPLES))], TODAY)
+    p["price_items"].append({"item": "Extra", "low": float("nan"), "high": float("nan")})
+    assert gen.pricing_totals(p)[1] > 0
+    assert "Extra" in render.render_html(p)
+    assert Document(BytesIO(docx_export.build_docx(p)))
+
+
+def test_price_range_text():
+    assert gen.price_range_text(4000, 4000, "$") == "$4,000"
+    assert gen.price_range_text(3000, 5000, "£") == "£3,000 – £5,000"
+
+
+def test_summary_keeps_proper_nouns():
+    assert gen._lower_first("Google Ads setup") == "Google Ads setup"
+    assert gen._lower_first("SEO audit") == "SEO audit"
+    assert gen._lower_first("Increase online bookings") == "increase online bookings"
+
+
+def _app():
+    from streamlit.testing.v1 import AppTest
+    return AppTest.from_file(str(Path(__file__).resolve().parent.parent / "app.py"), default_timeout=60).run()
+
+
+def _click(at, label):
+    [b for b in at.button if b.label == label][0].click().run()
+
+
+def test_app_starts_empty():
+    at = _app()
+    assert not at.exception
+    assert at.text_input(key="in_client").value == "" and at.text_area(key="in_goals").value == ""
+    assert not at.session_state.has_proposal
+    assert not at.tabs and "Start a proposal" in "".join(m.value for m in at.markdown)
+
+
+def test_generate_needs_a_client_name():
+    at = _app()
+    _click(at, "Generate proposal")
+    assert not at.exception and not at.session_state.has_proposal
+    assert any("client name" in w.value.lower() for w in at.sidebar.warning)
+
+
+def test_load_sample_and_manual_entry_show_a_proposal():
+    at = _app()
+    _click(at, "Load sample")
+    assert not at.exception and at.session_state.has_proposal
+    assert at.text_input(key="e_client").value == at.text_input(key="in_client").value != ""
+    at.text_input(key="in_client").set_value("Manual Co").run()
+    _click(at, "Generate proposal")
+    assert not at.exception and at.text_input(key="e_client").value == "Manual Co"
+
+
+def test_app_survives_switching_input_style():
+    at = _app()
+    _click(at, "Load sample")
+    client = at.text_input(key="in_client").value
+    at.radio(key="in_mode").set_value("Free-form paste").run()
+    at.run()
+    assert not at.exception
+    at.radio(key="in_mode").set_value("Form").run()
+    assert not at.exception and at.text_input(key="in_client").value == client
+
+
+def test_pdf_reports_missing_browser(monkeypatch):
+    monkeypatch.setattr(pdf_export, "find_browser", lambda: None)
+    with pytest.raises(pdf_export.PdfUnavailable):
+        pdf_export.html_to_pdf("<p>x</p>")
+
+
+@pytest.mark.skipif(pdf_export.find_browser() is None, reason="needs Chrome or Edge")
+def test_pdf_is_created_with_one_page_per_section():
+    p = gen.build_proposal(SAMPLES[next(iter(SAMPLES))], TODAY)
+    data = pdf_export.html_to_pdf(render.render_html(p))
+    assert data.startswith(b"%PDF-")
+    assert len(re.findall(rb"/Type\s*/Page[^s]", data)) == 6
+
+
+def test_no_eyebrow_labels_in_html():
+    html = render.render_html(gen.build_proposal(SAMPLES[next(iter(SAMPLES))], TODAY))
+    assert 'class="eyebrow"' not in html
 
 
 def test_docx_opens_and_has_content():

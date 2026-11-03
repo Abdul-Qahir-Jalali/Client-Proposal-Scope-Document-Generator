@@ -133,6 +133,8 @@ NEXT_STEPS = [
 ]
 
 _SYMBOL_BY_CODE = {"usd": "$", "gbp": "£", "eur": "€", "inr": "₹"}
+_NOT_MONEY_RE = re.compile(
+    r"\s*(?:%|(?:percent|months?|weeks?|days?|years?|yrs?|hours?|hrs?|pages?|phases?|payments?|installments?)\b)", re.I)
 _NUMBER_RE = re.compile(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?")
 _BULLET_RE = re.compile(r"^\s*(?:[-*•–]|\d+[.)])\s*")
 _LABEL_RE = re.compile(r"^\s*([A-Za-z][A-Za-z ]{1,24}?)\s*[:=]\s*(.*)$")
@@ -209,6 +211,9 @@ def parse_money(text: str) -> tuple[float, float, str]:
             currency = _SYMBOL_BY_CODE.get(c, c.upper() + " ")
     values = []
     for m in _NUMBER_RE.finditer(text):
+        # Skip numbers that are not money: '50% upfront', '3 months', '10 pages'.
+        if _NOT_MONEY_RE.match(text, m.end()):
+            continue
         number = float(m.group(0).replace(",", ""))
         if text[m.end():m.end() + 1].lower() == "k":
             number *= 1000
@@ -216,6 +221,29 @@ def parse_money(text: str) -> tuple[float, float, str]:
     if not values:
         return 0.0, 0.0, currency
     return min(values[:2]), max(values[:2]), currency
+
+
+def _amount(value) -> float | None:
+    """A price cell as a float, or None when it is blank (None or NaN from an empty table cell)."""
+    return None if value is None or math.isnan(float(value)) else float(value)
+
+
+def clean_amounts(low, high) -> tuple[float, float]:
+    """Make an editable price row safe: blank cells become 0, or copy the other end."""
+    low, high = _amount(low), _amount(high)
+    if low is None and high is None:
+        return 0.0, 0.0
+    low = high if low is None else low
+    high = low if high is None else max(high, low)
+    return low, high
+
+
+def price_range_text(low, high, currency: str) -> str:
+    """'$4,000' for a fixed price, '$3,000 – $5,000' for a range."""
+    low, high = clean_amounts(low, high)
+    if round(low) == round(high):
+        return money(low, currency)
+    return f"{money(low, currency)} – {money(high, currency)}"
 
 
 def parse_weeks(text: str, default: int = 6) -> int:
@@ -291,7 +319,12 @@ def build_price_items(milestones: list[dict], weights: list[float], low: float, 
 
 
 def _lower_first(text: str) -> str:
-    return text[:1].lower() + text[1:] if text and not text[:2].isupper() else text
+    """Lowercase the first letter to fit mid-sentence, unless it looks like a name or acronym
+    ('SEO audit', 'Google Ads setup')."""
+    has_proper_noun = any(w[:1].isupper() for w in text.split()[1:])
+    if not text or text[:2].isupper() or has_proper_noun:
+        return text
+    return text[:1].lower() + text[1:]
 
 
 def _lower_words(text: str) -> str:
@@ -307,17 +340,13 @@ def _join(items: list[str]) -> str:
 
 
 def pricing_totals(p: dict) -> tuple[float, float]:
-    low = sum(float(i.get("low") or 0) for i in p["price_items"])
-    high = sum(float(i.get("high") or 0) for i in p["price_items"])
-    return low, high
+    amounts = [clean_amounts(i.get("low"), i.get("high")) for i in p["price_items"]]
+    return sum(a[0] for a in amounts), sum(a[1] for a in amounts)
 
 
 def price_text(p: dict) -> str:
     low, high = pricing_totals(p)
-    if high <= 0:
-        return "To be confirmed"
-    cur = p["currency"]
-    return money(low, cur) if round(low) == round(high) else f"{money(low, cur)} – {money(high, cur)}"
+    return price_range_text(low, high, p["currency"]) if high > 0 else "To be confirmed"
 
 
 def build_proposal(inputs: dict, today: date | None = None) -> dict:

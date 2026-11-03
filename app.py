@@ -7,11 +7,16 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from proposal import docx_export, generator as gen, render
+from proposal import docx_export, generator as gen, pdf_export, render
 
 st.set_page_config(page_title="Proposal Generator", page_icon="📄", layout="wide")
 
-SAMPLES = gen.load_samples()
+@st.cache_data
+def _load_samples() -> dict[str, dict]:
+    return gen.load_samples()
+
+
+SAMPLES = _load_samples()
 FORM, FREE = "Form", "Free-form paste"
 
 # Content widgets that hold one list item per line: widget key -> proposal key
@@ -20,6 +25,9 @@ LIST_AREAS = {
     "e_assumptions": "assumptions", "e_payment": "payment_terms",
     "e_notes": "notes", "e_steps": "next_steps",
 }
+
+
+INPUT_KEYS = ("in_client", "in_type", "in_goals", "in_deliv", "in_timeline", "in_pricing", "in_notes", "in_ff")
 
 
 def _lines(items: list[str]) -> str:
@@ -45,6 +53,7 @@ def load_proposal(p: dict) -> None:
     """Copy a freshly generated proposal into the live editing widgets."""
     ss = st.session_state
     ss.ver = ss.get("ver", 0) + 1
+    ss.pop("pdf", None)   # a PDF made from the previous proposal must not be offered again
     ss.currency = p["currency"]
     ss.e_title, ss.e_client, ss.e_by = p["title"], p["client"], p["prepared_by"]
     ss.e_date, ss.e_valid = p["prepared_on"], p["valid_until"]
@@ -61,15 +70,20 @@ def generate() -> None:
     if ss.in_mode == FREE:
         inputs = gen.parse_freeform(ss.in_ff)
         inputs["prepared_by"] = ss.in_prepared
-        fill_inputs(inputs)
     else:
         inputs = {
             "client_name": ss.in_client, "project_type": ss.in_type, "goals": ss.in_goals,
             "deliverables": ss.in_deliv, "timeline": ss.in_timeline, "pricing": ss.in_pricing,
             "notes": ss.in_notes, "prepared_by": ss.in_prepared,
         }
-        ss.in_ff = gen.to_freeform(inputs)
+    if not inputs["client_name"].strip():
+        ss.notice = ("No client name found. Start a line with 'Client:' so the generator can find it."
+                     if ss.in_mode == FREE else "Add a client name first.")
+        return
+    ss.pop("notice", None)
+    fill_inputs(inputs)   # keeps the form and the free-form text in step with each other
     load_proposal(gen.build_proposal(inputs))
+    ss.has_proposal = True
 
 
 def load_sample() -> None:
@@ -100,20 +114,24 @@ def collect(ms_df: pd.DataFrame, price_df: pd.DataFrame) -> dict:
         end = max(start, int(row.end)) if pd.notna(row.end) else start
         p["milestones"].append({"phase": str(row.phase).strip(), "start": start, "end": end,
                                 "description": "" if pd.isna(row.description) else str(row.description)})
-    p["price_items"] = [
-        {"item": str(r.item), "low": float(r.low or 0), "high": float(max(r.high or 0, r.low or 0))}
-        for r in price_df.dropna(subset=["item"]).itertuples() if str(r.item).strip()
-    ]
+    p["price_items"] = []
+    for r in price_df.dropna(subset=["item"]).itertuples():
+        if str(r.item).strip():
+            low, high = gen.clean_amounts(r.low, r.high)
+            p["price_items"].append({"item": str(r.item).strip(), "low": low, "high": high})
     return p
 
 
 # ------------------------------------------------------------------- startup
 
-if "ver" not in st.session_state:
+if "has_proposal" not in st.session_state:
+    # Start empty: nothing is generated until the user enters details or loads a sample.
+    st.session_state.has_proposal = False
     st.session_state.in_mode = FORM
     st.session_state.in_prepared = "Allure Digital"
     st.session_state.sample_choice = next(iter(SAMPLES))
-    load_sample()
+    for _key in INPUT_KEYS:
+        st.session_state[_key] = ""
 
 # ------------------------------------------------------------------- sidebar
 
@@ -124,7 +142,9 @@ with st.sidebar:
     st.divider()
     st.radio("Input style", [FORM, FREE], key="in_mode", horizontal=True)
     st.text_input("Prepared by (your company)", key="in_prepared")
-    if st.session_state.in_mode == FORM:
+    # Both groups are drawn on every run, even when collapsed. Streamlit deletes the state of any
+    # widget that is not drawn, which would wipe the form when switching to free-form text.
+    with st.expander("Form fields", expanded=st.session_state.in_mode == FORM):
         st.text_input("Client name", key="in_client")
         st.text_input("Project type", key="in_type", help="For example: website, mobile app, marketing campaign, branding")
         st.text_area("Goals (one per line)", key="in_goals", height=100)
@@ -132,19 +152,29 @@ with st.sidebar:
         st.text_input("Timeline", key="in_timeline", help="For example: 8 weeks, 3 months, 30 days")
         st.text_input("Pricing or range", key="in_pricing", help="For example: $4,000 or $3k - $5k")
         st.text_area("Special notes (one per line)", key="in_notes", height=90)
-    else:
+    with st.expander("Free-form text", expanded=st.session_state.in_mode == FREE):
         st.text_area("Paste project details", key="in_ff", height=420,
                      help="Use lines like 'Client: ...', 'Goals: ...', 'Timeline: ...'. Bullet lines under a label belong to it.")
     st.button("Generate proposal", type="primary", on_click=generate, width="stretch")
+    if st.session_state.get("notice"):
+        st.warning(st.session_state.notice)
     st.caption("Generating again replaces your edits with a fresh draft.")
 
 # --------------------------------------------------------------------- main
 
 st.title("Client Proposal & Scope Document Generator")
-st.caption("Edit any field on the left. The proposal on the right updates as you type.")
 
-if not st.session_state.in_client.strip() and st.session_state.in_mode == FREE:
-    st.warning("No client name found. Start a line with 'Client:' so the generator can find it.")
+if not st.session_state.has_proposal:
+    with st.container(border=True):
+        st.markdown(
+            "#### Start a proposal\n"
+            "1. Enter the client and project details in the sidebar, then press **Generate proposal**.\n"
+            "2. Or pick a sample project in the sidebar and press **Load sample**.\n\n"
+            "Your proposal appears here, and you can edit it live before exporting."
+        )
+    st.stop()
+
+st.caption("Edit any field on the left. The proposal on the right updates as you type.")
 
 left, right = st.columns([5, 7], gap="large")
 
@@ -195,12 +225,28 @@ with left:
     with tab_export:
         stem = render.filename_stem(proposal)
         st.markdown("Download the finished proposal.")
-        st.download_button("Download HTML presentation", render.render_html(proposal), f"{stem}.html",
-                           "text/html", width="stretch", type="primary")
-        st.download_button("Download Word document (.docx)", docx_export.build_docx(proposal), f"{stem}.docx",
-                           "application/vnd.openxmlformats-officedocument.wordprocessingml.document", width="stretch")
-        st.info("For a PDF: open the downloaded HTML in your browser, press Ctrl+P and choose Save as PDF. "
-                "The layout is set up for printing, one section per page.")
+        # Callables: the file is built only when the button is clicked, not on every keystroke.
+        st.download_button("Download HTML presentation", lambda: render.render_html(proposal), f"{stem}.html",
+                           "text/html", width="stretch", type="primary", on_click="ignore")
+        st.download_button("Download Word document (.docx)", lambda: docx_export.build_docx(proposal), f"{stem}.docx",
+                           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                           width="stretch", on_click="ignore")
+        export_html = render.render_html(proposal)
+        if st.button("Create PDF", width="stretch", help="Uses Chrome or Edge on this computer. Takes a few seconds."):
+            pdf = st.session_state.get("pdf")
+            if pdf is None or pdf[0] != export_html:   # skip the browser run when nothing changed
+                try:
+                    with st.spinner("Creating PDF..."):
+                        st.session_state.pdf = (export_html, pdf_export.html_to_pdf(export_html))
+                except pdf_export.PdfUnavailable as exc:
+                    st.session_state.pop("pdf", None)
+                    st.error(str(exc))
+        if "pdf" in st.session_state:
+            made_from, pdf_bytes = st.session_state.pdf
+            st.download_button("Download PDF", pdf_bytes, f"{stem}.pdf", "application/pdf",
+                               width="stretch", type="primary", on_click="ignore")
+            if made_from != export_html:
+                st.caption("You have edited the proposal since this PDF was made. Press Create PDF again to update it.")
         st.caption("You can also click directly on text in the preview and edit it there. "
                    "Use the preview's own Download HTML button to keep those edits.")
 

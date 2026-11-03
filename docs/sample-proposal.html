@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Website Redesign Proposal for Bright Dental Clinic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Layout: a stack of page-sized slides on a quiet canvas. One teal accent, used for the timeline and key figures. */
+  :root {
+    --bg: #EEF1F3;
+    --surface: #FFFFFF;
+    --ink: #14202B;
+    --muted: #5B6B79;
+    --line: #DCE2E8;
+    --accent: #0B6B63;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #DDF0EE;
+    --cover: #0E2A33;
+    --cover-ink: #F2F7F8;
+    --cover-muted: #9DB4BC;
+    --cover-accent: #4FC3B6;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0A1014; --surface: #121C22; --ink: #E7EEF2; --muted: #93A4B1; --line: #25343D;
+      --accent: #4FC3B6; --accent-ink: #06211E; --accent-soft: #123A37;
+      --cover: #081A20; --cover-ink: #F2F7F8; --cover-muted: #86A0A9;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0A1014; --surface: #121C22; --ink: #E7EEF2; --muted: #93A4B1; --line: #25343D;
+    --accent: #4FC3B6; --accent-ink: #06211E; --accent-soft: #123A37;
+    --cover: #081A20; --cover-ink: #F2F7F8; --cover-muted: #86A0A9;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 var(--body);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 24px 48px;
+  }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; text-wrap: balance; }
+  h1, h2 { letter-spacing: -0.01em; }
+  h2 { font-size: clamp(1.6rem, 3.2vw, 2.1rem); }
+  h3 { font-size: 1.05rem; }
+  p { margin: 0; max-width: 68ch; }
+  ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.55rem; }
+  li { position: relative; padding-left: 1.25rem; max-width: 68ch; }
+  li::before { content: ""; position: absolute; left: 0; top: 0.72em; width: 0.6rem; height: 2px; background: var(--accent); }
+  .label, th, .glance dt { font: 600 0.85rem/1.3 var(--body); color: var(--muted); }
+  ::selection { background: var(--accent); color: var(--accent-ink); }
+  main { caret-color: var(--accent); }
+  html { scrollbar-color: var(--muted) var(--bg); }
+  a { text-underline-offset: 0.2em; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .deck { max-width: 1000px; margin: 0 auto; display: grid; gap: 20px; }
+  .slide { background: var(--surface); border: 1px solid var(--line); padding: clamp(24px, 5vw, 56px); display: grid; gap: 28px; align-content: start; min-width: 0; }
+  .slide > header { display: grid; gap: 8px; }
+  .slide > header p { color: var(--muted); }
+
+  /* Cover */
+  .cover { background: var(--cover); color: var(--cover-ink); border-color: var(--cover); min-height: 420px; align-content: space-between; }
+  .cover h1 { font-size: clamp(2.2rem, 6vw, 3.8rem); max-width: 16ch; }
+  .cover .for { font: 500 1.25rem var(--display); color: var(--cover-ink); }
+  .cover .meta { display: flex; flex-wrap: wrap; gap: 8px 40px; font: 400 0.9rem var(--body); color: var(--cover-muted); }
+  .cover .meta b { display: block; color: var(--cover-ink); font-weight: 500; }
+  .cover .rule { width: 72px; height: 4px; background: var(--cover-accent); margin-block: 18px 22px; }
+
+  /* Summary */
+  .lead { font-size: 1.2rem; line-height: 1.65; }
+  /* Plain fact sheet: three facts between two rules, no tiles. */
+  .glance { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px 32px; padding-block: 18px; border-block: 1px solid var(--line); }
+  .glance > div { display: grid; gap: 4px; }
+  .glance dd { margin: 0; font: 600 1.15rem/1.3 var(--body); color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  /* Scope */
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 32px; }
+  .cols > div { display: grid; gap: 14px; align-content: start; min-width: 0; }
+  .out li::before { background: var(--muted); }
+  .subtle { color: var(--muted); }
+
+  /* Timeline */
+  .gantt { display: grid; gap: 0; border-top: 1px solid var(--line); padding-top: 6px; overflow-x: auto; }
+  .g-row { display: grid; grid-template-columns: minmax(96px, 190px) minmax(230px, 1fr); border-bottom: 1px solid var(--line); align-items: center; min-width: 0; }
+  .g-name { padding: 10px 12px 10px 0; font-weight: 600; font-size: 0.92rem; }
+  .track { display: grid; grid-template-columns: repeat(var(--n), 1fr); grid-template-rows: 1fr; align-items: center; min-height: 38px; }
+  .track > i { grid-row: 1; align-self: stretch; border-left: 1px solid var(--line); }   /* one cell per week = the gridlines */
+  .bar { grid-row: 1; z-index: 1; background: var(--accent); color: var(--accent-ink); border-radius: 3px; padding: 4px 8px; font: 600 0.78rem var(--body); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-inline: 2px; }
+  .g-head .track { min-height: 0; padding-block: 6px; }
+  .g-head .wk { font: 500 0.8rem var(--body); color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+  .table-wrap { overflow-x: auto; }
+  th { text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid var(--ink); }
+  td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; white-space: nowrap; }
+  td.when { font-weight: 600; white-space: nowrap; color: var(--accent); font-variant-numeric: tabular-nums; }
+  tfoot td { border-bottom: 0; border-top: 2px solid var(--ink); font: 700 1.2rem var(--display); }
+
+  /* Closing */
+  .sign { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px; margin-top: 12px; }
+  .sign div { border-top: 1px solid var(--ink); padding-top: 8px; font-size: 0.85rem; color: var(--muted); }
+  .steps { counter-reset: step; }
+  .steps li { padding-left: 2.2rem; }
+  .steps li::before { counter-increment: step; content: counter(step); background: none; top: 0; width: auto; height: auto; font: 700 0.95rem var(--body); color: var(--accent); font-variant-numeric: tabular-nums; }
+
+  /* Editing */
+  .toolbar { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; max-width: 1000px; margin: 0 auto 16px; padding: 10px 14px; background: var(--ink); color: var(--bg); font: 500 0.82rem var(--body); }
+  .toolbar span { flex: 1 1 220px; }
+  .toolbar button { font: 600 0.82rem var(--body); padding: 7px 14px; border: 1px solid var(--bg); background: transparent; color: var(--bg); cursor: pointer; }
+  .toolbar button.primary { background: var(--bg); color: var(--ink); }
+  .toolbar button:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .toolbar button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  [contenteditable="true"] :is(p, li, h1, h2, h3, td, th, dd, .for, .meta b):hover { outline: 1px dashed var(--accent); outline-offset: 3px; cursor: text; }
+  [contenteditable="true"] :is(p, li, h1, h2, h3, td, th, dd, .for, .meta b):focus { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  @media (max-width: 640px) { .cover { min-height: 340px; } .g-row { grid-template-columns: 84px minmax(180px, 1fr); } .g-name { font-size: 0.85rem; padding-right: 6px; } .bar { padding: 4px 3px; font-size: 0.7rem; margin-inline: 1px; } }
+  @media print {
+    :root, :root[data-theme] { --bg: #fff; --surface: #fff; --ink: #14202B; --muted: #5B6B79; --line: #DCE2E8; --accent: #0B6B63; --accent-ink: #fff; --accent-soft: #DDF0EE; --cover: #0E2A33; }
+    body { background: #fff; padding: 0; font-size: 12pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .deck { gap: 0; max-width: none; }
+    .slide { border: 0; break-after: page; padding: 28px 8px; }
+    .cover { min-height: 90vh; }
+    .no-export { display: none !important; }
+  }
+  @media (prefers-reduced-motion: no-preference) { .toolbar button { transition: background 0.15s; } }
+</style>
+</head>
+<body>
+
+<main class="deck" id="doc">
+
+  <section class="slide cover">
+    <div>
+      <div class="rule"></div>
+      <h1>Website Redesign Proposal</h1>
+      <p class="for">Prepared for Bright Dental Clinic</p>
+    </div>
+    <div class="meta">
+      <div>Prepared by<b>Allure Digital</b></div>
+      <div>Date<b>4 November 2026</b></div>
+      <div>Valid until<b>4 December 2026</b></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <header><h2>Executive summary</h2></header>
+    <p class="lead">Allure Digital will plan, build and deliver a website redesign for Bright Dental Clinic over 8 weeks. The key goals are to increase online appointment bookings by 30%, modernise the clinic&#39;s look and build patient trust and make the site fast and easy to use on phones. The work covers 5 key deliverables, including 6-page responsive website (Home, Services, Team, Pricing, Reviews, Contact) and online appointment booking integration. The estimated investment is $6,500 – $8,000. This document sets out the scope, timeline and pricing so both sides agree on the work before it starts.</p>
+    <dl class="glance">
+      <div><dt>Timeline</dt><dd>8 weeks</dd></div>
+      <div><dt>Deliverables</dt><dd>5</dd></div>
+      <div><dt>Investment</dt><dd>$6,500 – $8,000</dd></div>
+    </dl>
+    
+    <div>
+      <h3>Project goals</h3>
+      <ul style="margin-top:12px"><li>Increase online appointment bookings by 30%</li><li>Modernise the clinic&#39;s look and build patient trust</li><li>Make the site fast and easy to use on phones</li></ul>
+    </div>
+    
+  </section>
+
+  <section class="slide">
+    <header><h2>Scope of work</h2><p>What is included, and what is not.</p></header>
+    <div class="cols">
+      <div>
+        <h3>Included</h3>
+        <ul><li>6-page responsive website (Home, Services, Team, Pricing, Reviews, Contact)</li><li>Online appointment booking integration</li><li>Patient testimonials page</li><li>Basic on-page SEO and Google Business setup</li><li>30 days of post-launch support</li><li>Two rounds of revisions per deliverable</li><li>Regular progress updates</li></ul>
+      </div>
+      <div class="out">
+        <h3>Not included</h3>
+        <ul><li>Writing website copy and taking photography (unless listed above)</li><li>Domain registration and hosting fees</li><li>Paid plug-ins, stock images and third-party licences</li><li>Work on pages or features not listed in the deliverables</li></ul>
+      </div>
+    </div>
+    
+    <div>
+      <h3>Assumptions</h3>
+      <ul style="margin-top:12px" class="subtle"><li>The client names one main contact who can give feedback and approvals.</li><li>Feedback is shared within 3 working days. Late feedback may move the timeline.</li><li>Content, logins and files the client agreed to supply arrive on time.</li><li>Requests outside the scope above are quoted and agreed in writing before work starts.</li></ul>
+    </div>
+    
+  </section>
+
+  <section class="slide">
+    <header><h2>Timeline and milestones</h2><p>8 weeks across 4 phases.</p></header>
+    <div class="gantt" role="img" aria-label="Project timeline by week" style="--n: 8">
+      <div class="g-row g-head">
+        <div class="g-name label">Week</div>
+        <div class="track"><div class="wk">1</div><div class="wk">2</div><div class="wk">3</div><div class="wk">4</div><div class="wk">5</div><div class="wk">6</div><div class="wk">7</div><div class="wk">8</div></div>
+      </div>
+      
+      <div class="g-row">
+        <div class="g-name">Discovery &amp; Planning</div>
+        <div class="track"><i style="grid-column: 1"></i><i style="grid-column: 2"></i><i style="grid-column: 3"></i><i style="grid-column: 4"></i><i style="grid-column: 5"></i><i style="grid-column: 6"></i><i style="grid-column: 7"></i><i style="grid-column: 8"></i><div class="bar" style="grid-column: 1 / 2" title="Week 1">W1</div></div>
+      </div>
+      
+      <div class="g-row">
+        <div class="g-name">Design</div>
+        <div class="track"><i style="grid-column: 1"></i><i style="grid-column: 2"></i><i style="grid-column: 3"></i><i style="grid-column: 4"></i><i style="grid-column: 5"></i><i style="grid-column: 6"></i><i style="grid-column: 7"></i><i style="grid-column: 8"></i><div class="bar" style="grid-column: 2 / 4" title="Weeks 2–3">W2–3</div></div>
+      </div>
+      
+      <div class="g-row">
+        <div class="g-name">Development</div>
+        <div class="track"><i style="grid-column: 1"></i><i style="grid-column: 2"></i><i style="grid-column: 3"></i><i style="grid-column: 4"></i><i style="grid-column: 5"></i><i style="grid-column: 6"></i><i style="grid-column: 7"></i><i style="grid-column: 8"></i><div class="bar" style="grid-column: 4 / 7" title="Weeks 4–6">W4–6</div></div>
+      </div>
+      
+      <div class="g-row">
+        <div class="g-name">Review &amp; Launch</div>
+        <div class="track"><i style="grid-column: 1"></i><i style="grid-column: 2"></i><i style="grid-column: 3"></i><i style="grid-column: 4"></i><i style="grid-column: 5"></i><i style="grid-column: 6"></i><i style="grid-column: 7"></i><i style="grid-column: 8"></i><div class="bar" style="grid-column: 7 / 9" title="Weeks 7–8">W7–8</div></div>
+      </div>
+      
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>When</th><th>Phase</th><th>What happens</th></tr></thead>
+        <tbody>
+          
+          <tr><td class="when">Week 1</td><td><b>Discovery &amp; Planning</b></td><td>Kickoff call, content audit, sitemap and wireframes approved.</td></tr>
+          
+          <tr><td class="when">Weeks 2–3</td><td><b>Design</b></td><td>Visual design of the key pages, with two rounds of revisions.</td></tr>
+          
+          <tr><td class="when">Weeks 4–6</td><td><b>Development</b></td><td>Build, content entry, forms and integrations, tested on real devices.</td></tr>
+          
+          <tr><td class="when">Weeks 7–8</td><td><b>Review &amp; Launch</b></td><td>Client review, fixes, go-live and handover.</td></tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <header><h2>Investment</h2><p>Estimated total: $6,500 – $8,000.</p></header>
+    
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Phase</th><th class="num">Estimate</th></tr></thead>
+        <tbody>
+          
+          <tr><td>Discovery &amp; Planning</td><td class="num">$980 – $1,200</td></tr>
+          
+          <tr><td>Design</td><td class="num">$1,620 – $2,000</td></tr>
+          
+          <tr><td>Development</td><td class="num">$2,600 – $3,200</td></tr>
+          
+          <tr><td>Review &amp; Launch</td><td class="num">$1,300 – $1,600</td></tr>
+          
+        </tbody>
+        <tfoot><tr><td>Total</td><td class="num">$6,500 – $8,000</td></tr></tfoot>
+      </table>
+    </div>
+    
+    <div><h3>Payment terms</h3><ul style="margin-top:12px"><li>40% on signing, to book the project in.</li><li>30% at the mid-point milestone.</li><li>30% on final delivery.</li><li>Invoices are payable within 14 days.</li></ul></div>
+    
+    
+  </section>
+
+  <section class="slide">
+    <header><h2>Next steps</h2><p>How we get started.</p></header>
+    
+    <div><h3>Special considerations</h3><ul style="margin-top:12px"><li>Client will supply team photos and service descriptions by the end of week 2</li><li>Site must be live before 15 January for the new-year promotion</li></ul></div>
+    
+    <ul class="steps"><li>Review this proposal and share any changes you would like.</li><li>Sign off the scope, timeline and pricing.</li><li>Pay the first invoice to reserve the start date.</li><li>Join the kickoff call and begin Phase 1.</li></ul>
+    <div class="sign">
+      <div>Accepted for Bright Dental Clinic<br>Name, signature and date</div>
+      <div>For Allure Digital<br>Name, signature and date</div>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>

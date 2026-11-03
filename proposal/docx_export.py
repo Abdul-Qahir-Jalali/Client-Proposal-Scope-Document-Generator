@@ -7,7 +7,7 @@ from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt, RGBColor
 
-from .generator import money, price_text, pricing_totals
+from .generator import price_range_text, price_text, pricing_totals
 from .render import total_weeks, week_label
 
 ACCENT = RGBColor(0x0B, 0x6B, 0x63)
@@ -67,8 +67,7 @@ def build_docx(p: dict) -> bytes:
     if pricing_totals(p)[1] > 0:
         cur = p["currency"]
         _table(doc, ["Phase", "Estimate"],
-               [[i["item"], money(i["low"], cur) if round(i["low"]) == round(i["high"])
-                 else f"{money(i['low'], cur)} – {money(i['high'], cur)}"] for i in p["price_items"]]
+               [[i["item"], price_range_text(i["low"], i["high"], cur)] for i in p["price_items"]]
                + [["Total", price_text(p)]], right_cols=(1,))
         if p["payment_terms"]:
             doc.add_heading("Payment terms", level=2)

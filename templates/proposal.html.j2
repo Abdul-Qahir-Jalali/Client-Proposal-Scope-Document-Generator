@@ -6,7 +6,7 @@
 <title>{{ p.title }} for {{ p.client }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   /* Layout: a stack of page-sized slides on a quiet canvas. One teal accent, used for the timeline and key figures. */
   :root {
@@ -21,9 +21,9 @@
     --cover: #0E2A33;
     --cover-ink: #F2F7F8;
     --cover-muted: #9DB4BC;
+    --cover-accent: #4FC3B6;
     --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
     --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
-    --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -48,37 +48,40 @@
     padding-right: max(16px, env(safe-area-inset-right, 0px));
     padding-block: 24px 48px;
   }
-  h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; text-wrap: balance; }
+  h1, h2 { letter-spacing: -0.01em; }
   h2 { font-size: clamp(1.6rem, 3.2vw, 2.1rem); }
   h3 { font-size: 1.05rem; }
   p { margin: 0; max-width: 68ch; }
   ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.55rem; }
   li { position: relative; padding-left: 1.25rem; max-width: 68ch; }
   li::before { content: ""; position: absolute; left: 0; top: 0.72em; width: 0.6rem; height: 2px; background: var(--accent); }
-  .eyebrow { font: 500 0.75rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .label, th, .glance dt { font: 600 0.85rem/1.3 var(--body); color: var(--muted); }
+  ::selection { background: var(--accent); color: var(--accent-ink); }
+  main { caret-color: var(--accent); }
+  html { scrollbar-color: var(--muted) var(--bg); }
+  a { text-underline-offset: 0.2em; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
   .deck { max-width: 1000px; margin: 0 auto; display: grid; gap: 20px; }
   .slide { background: var(--surface); border: 1px solid var(--line); padding: clamp(24px, 5vw, 56px); display: grid; gap: 28px; align-content: start; min-width: 0; }
-  .slide > header { display: grid; gap: 10px; }
+  .slide > header { display: grid; gap: 8px; }
+  .slide > header p { color: var(--muted); }
 
   /* Cover */
   .cover { background: var(--cover); color: var(--cover-ink); border-color: var(--cover); min-height: 420px; align-content: space-between; }
-  .cover .eyebrow { color: var(--cover-muted); }
   .cover h1 { font-size: clamp(2.2rem, 6vw, 3.8rem); max-width: 16ch; }
   .cover .for { font: 500 1.25rem var(--display); color: var(--cover-ink); }
-  .cover .meta { display: flex; flex-wrap: wrap; gap: 8px 40px; font: 400 0.85rem var(--mono); color: var(--cover-muted); }
+  .cover .meta { display: flex; flex-wrap: wrap; gap: 8px 40px; font: 400 0.9rem var(--body); color: var(--cover-muted); }
   .cover .meta b { display: block; color: var(--cover-ink); font-weight: 500; }
-  .cover .rule { width: 72px; height: 4px; background: var(--accent); margin-block: 18px 22px; }
-  :root[data-theme="dark"] .cover .rule, .cover .rule { background: #4FC3B6; }
+  .cover .rule { width: 72px; height: 4px; background: var(--cover-accent); margin-block: 18px 22px; }
 
   /* Summary */
   .lead { font-size: 1.2rem; line-height: 1.65; }
-  .glance { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); border: 1px solid var(--line); }
-  .glance > div { padding: 16px 18px; display: grid; gap: 4px; border-left: 1px solid var(--line); }
-  .glance > div:first-child { border-left: 0; }
-  .glance dt { font: 500 0.7rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
-  .glance dd { margin: 0; font: 700 1.5rem var(--display); color: var(--accent); font-variant-numeric: tabular-nums; }
-  .glance { margin: 0; }
+  /* Plain fact sheet: three facts between two rules, no tiles. */
+  .glance { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px 32px; padding-block: 18px; border-block: 1px solid var(--line); }
+  .glance > div { display: grid; gap: 4px; }
+  .glance dd { margin: 0; font: 600 1.15rem/1.3 var(--body); color: var(--ink); font-variant-numeric: tabular-nums; }
 
   /* Scope */
   .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 32px; }
@@ -87,20 +90,20 @@
   .subtle { color: var(--muted); }
 
   /* Timeline */
-  .gantt { display: grid; gap: 0; border-top: 1px solid var(--line); overflow-x: auto; }
-  .g-row { display: grid; grid-template-columns: minmax(130px, 190px) minmax(360px, 1fr); border-bottom: 1px solid var(--line); align-items: center; min-width: 0; }
+  .gantt { display: grid; gap: 0; border-top: 1px solid var(--line); padding-top: 6px; overflow-x: auto; }
+  .g-row { display: grid; grid-template-columns: minmax(96px, 190px) minmax(230px, 1fr); border-bottom: 1px solid var(--line); align-items: center; min-width: 0; }
   .g-name { padding: 10px 12px 10px 0; font-weight: 600; font-size: 0.92rem; }
-  .track { display: grid; grid-template-columns: repeat(var(--n), 1fr); position: relative; padding-block: 8px;
-           background-image: repeating-linear-gradient(to right, var(--line) 0 1px, transparent 1px calc(100% / var(--n))); }
-  .bar { background: var(--accent); color: var(--accent-ink); border-radius: 3px; padding: 4px 8px; font: 500 0.72rem var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-inline: 2px; }
-  .g-head .track { padding-block: 6px; }
-  .g-head .wk { font: 400 0.7rem var(--mono); color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+  .track { display: grid; grid-template-columns: repeat(var(--n), 1fr); grid-template-rows: 1fr; align-items: center; min-height: 38px; }
+  .track > i { grid-row: 1; align-self: stretch; border-left: 1px solid var(--line); }   /* one cell per week = the gridlines */
+  .bar { grid-row: 1; z-index: 1; background: var(--accent); color: var(--accent-ink); border-radius: 3px; padding: 4px 8px; font: 600 0.78rem var(--body); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-inline: 2px; }
+  .g-head .track { min-height: 0; padding-block: 6px; }
+  .g-head .wk { font: 500 0.8rem var(--body); color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
   table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
   .table-wrap { overflow-x: auto; }
-  th { text-align: left; font: 500 0.72rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 10px 12px 10px 0; border-bottom: 2px solid var(--ink); }
+  th { text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid var(--ink); }
   td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; white-space: nowrap; }
-  td.when { font-family: var(--mono); font-size: 0.85rem; white-space: nowrap; color: var(--accent); }
+  td.when { font-weight: 600; white-space: nowrap; color: var(--accent); font-variant-numeric: tabular-nums; }
   tfoot td { border-bottom: 0; border-top: 2px solid var(--ink); font: 700 1.2rem var(--display); }
 
   /* Closing */
@@ -108,7 +111,7 @@
   .sign div { border-top: 1px solid var(--ink); padding-top: 8px; font-size: 0.85rem; color: var(--muted); }
   .steps { counter-reset: step; }
   .steps li { padding-left: 2.2rem; }
-  .steps li::before { counter-increment: step; content: counter(step); background: none; top: 0; width: auto; height: auto; font: 500 0.85rem var(--mono); color: var(--accent); }
+  .steps li::before { counter-increment: step; content: counter(step); background: none; top: 0; width: auto; height: auto; font: 700 0.95rem var(--body); color: var(--accent); font-variant-numeric: tabular-nums; }
 
   /* Editing */
   .toolbar { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; max-width: 1000px; margin: 0 auto 16px; padding: 10px 14px; background: var(--ink); color: var(--bg); font: 500 0.82rem var(--body); }
@@ -120,7 +123,7 @@
   [contenteditable="true"] :is(p, li, h1, h2, h3, td, th, dd, .for, .meta b):hover { outline: 1px dashed var(--accent); outline-offset: 3px; cursor: text; }
   [contenteditable="true"] :is(p, li, h1, h2, h3, td, th, dd, .for, .meta b):focus { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-  @media (max-width: 640px) { .cover { min-height: 340px; } .g-row { grid-template-columns: 120px minmax(320px, 1fr); } }
+  @media (max-width: 640px) { .cover { min-height: 340px; } .g-row { grid-template-columns: 84px minmax(180px, 1fr); } .g-name { font-size: 0.85rem; padding-right: 6px; } .bar { padding: 4px 3px; font-size: 0.7rem; margin-inline: 1px; } }
   @media print {
     :root, :root[data-theme] { --bg: #fff; --surface: #fff; --ink: #14202B; --muted: #5B6B79; --line: #DCE2E8; --accent: #0B6B63; --accent-ink: #fff; --accent-soft: #DDF0EE; --cover: #0E2A33; }
     body { background: #fff; padding: 0; font-size: 12pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -145,7 +148,6 @@
 
   <section class="slide cover">
     <div>
-      <div class="eyebrow">Proposal &amp; Scope of Work</div>
       <div class="rule"></div>
       <h1>{{ p.title }}</h1>
       <p class="for">Prepared for {{ p.client }}</p>
@@ -158,7 +160,7 @@
   </section>
 
   <section class="slide">
-    <header><div class="eyebrow">Executive summary</div><h2>What we will do, and why</h2></header>
+    <header><h2>Executive summary</h2></header>
     <p class="lead">{{ p.summary }}</p>
     <dl class="glance">
       <div><dt>Timeline</dt><dd>{{ weeks }} week{{ '' if weeks == 1 else 's' }}</dd></div>
@@ -174,7 +176,7 @@
   </section>
 
   <section class="slide">
-    <header><div class="eyebrow">Scope of work</div><h2>What is included, and what is not</h2></header>
+    <header><h2>Scope of work</h2><p>What is included, and what is not.</p></header>
     <div class="cols">
       <div>
         <h3>Included</h3>
@@ -194,16 +196,16 @@
   </section>
 
   <section class="slide">
-    <header><div class="eyebrow">Timeline &amp; milestones</div><h2>{{ weeks }} week{{ '' if weeks == 1 else 's' }}, {{ p.milestones | length }} phase{{ '' if p.milestones | length == 1 else 's' }}</h2></header>
+    <header><h2>Timeline and milestones</h2><p>{{ weeks }} week{{ '' if weeks == 1 else 's' }} across {{ p.milestones | length }} phase{{ '' if p.milestones | length == 1 else 's' }}.</p></header>
     <div class="gantt" role="img" aria-label="Project timeline by week" style="--n: {{ gantt.n }}">
       <div class="g-row g-head">
-        <div class="g-name eyebrow">Week</div>
+        <div class="g-name label">Week</div>
         <div class="track">{% for w in gantt.labels %}<div class="wk">{{ w.week if w.show else '' }}</div>{% endfor %}</div>
       </div>
       {% for m in gantt.rows %}
       <div class="g-row">
         <div class="g-name">{{ m.phase }}</div>
-        <div class="track"><div class="bar" style="grid-column: {{ m.col_start }} / {{ m.col_end }}" title="{{ m.label }}">{{ m.short }}</div></div>
+        <div class="track">{% for w in gantt.labels %}<i style="grid-column: {{ w.week }}"></i>{% endfor %}<div class="bar" style="grid-column: {{ m.col_start }} / {{ m.col_end }}" title="{{ m.label }}">{{ m.short }}</div></div>
       </div>
       {% endfor %}
     </div>
@@ -220,14 +222,14 @@
   </section>
 
   <section class="slide">
-    <header><div class="eyebrow">Investment</div><h2>{{ price_total }}</h2></header>
+    <header><h2>Investment</h2>{% if has_price %}<p>Estimated total: {{ price_total }}.</p>{% endif %}</header>
     {% if has_price %}
     <div class="table-wrap">
       <table>
         <thead><tr><th>Phase</th><th class="num">{{ 'Estimate' if range_prices else 'Amount' }}</th></tr></thead>
         <tbody>
           {% for i in p.price_items %}
-          <tr><td>{{ i.item }}</td><td class="num">{% if i.low|round == i.high|round %}{{ i.low | money(p.currency) }}{% else %}{{ i.low | money(p.currency) }} – {{ i.high | money(p.currency) }}{% endif %}</td></tr>
+          <tr><td>{{ i.item }}</td><td class="num">{{ i | price_range(p.currency) }}</td></tr>
           {% endfor %}
         </tbody>
         <tfoot><tr><td>Total</td><td class="num">{{ price_total }}</td></tr></tfoot>
@@ -242,7 +244,7 @@
   </section>
 
   <section class="slide">
-    <header><div class="eyebrow">Next steps</div><h2>How we get started</h2></header>
+    <header><h2>Next steps</h2><p>How we get started.</p></header>
     {% if p.notes %}
     <div><h3>Special considerations</h3><ul style="margin-top:12px">{% for n in p.notes %}<li>{{ n }}</li>{% endfor %}</ul></div>
     {% endif %}

@@ -7,7 +7,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from .generator import money, price_text, pricing_totals
+from .generator import clean_amounts, money, price_range_text, price_text, pricing_totals
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 
@@ -16,6 +16,7 @@ _env = Environment(
     autoescape=select_autoescape(["html", "j2"]),
 )
 _env.filters["money"] = money
+_env.filters["price_range"] = lambda item, currency: price_range_text(item["low"], item["high"], currency)
 
 
 def total_weeks(p: dict) -> int:
@@ -59,6 +60,7 @@ def render_html(p: dict, *, editable: bool = False) -> str:
         gantt=gantt(p),
         price_total=price_text(p),
         has_price=high > 0,
-        range_prices=any(round(i["low"]) != round(i["high"]) for i in p["price_items"]),
+        range_prices=any(round(lo) != round(hi) for lo, hi in
+                         (clean_amounts(i["low"], i["high"]) for i in p["price_items"])),
         file_stem=filename_stem(p),
     )
