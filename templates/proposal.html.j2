@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ p.title }} for {{ p.client }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Layout: a stack of page-sized slides on a quiet canvas. One teal accent, used for the timeline and key figures. */
+  :root {
+    --bg: #EEF1F3;
+    --surface: #FFFFFF;
+    --ink: #14202B;
+    --muted: #5B6B79;
+    --line: #DCE2E8;
+    --accent: #0B6B63;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #DDF0EE;
+    --cover: #0E2A33;
+    --cover-ink: #F2F7F8;
+    --cover-muted: #9DB4BC;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0A1014; --surface: #121C22; --ink: #E7EEF2; --muted: #93A4B1; --line: #25343D;
+      --accent: #4FC3B6; --accent-ink: #06211E; --accent-soft: #123A37;
+      --cover: #081A20; --cover-ink: #F2F7F8; --cover-muted: #86A0A9;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0A1014; --surface: #121C22; --ink: #E7EEF2; --muted: #93A4B1; --line: #25343D;
+    --accent: #4FC3B6; --accent-ink: #06211E; --accent-soft: #123A37;
+    --cover: #081A20; --cover-ink: #F2F7F8; --cover-muted: #86A0A9;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 var(--body);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 24px 48px;
+  }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+  h2 { font-size: clamp(1.6rem, 3.2vw, 2.1rem); }
+  h3 { font-size: 1.05rem; }
+  p { margin: 0; max-width: 68ch; }
+  ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.55rem; }
+  li { position: relative; padding-left: 1.25rem; max-width: 68ch; }
+  li::before { content: ""; position: absolute; left: 0; top: 0.72em; width: 0.6rem; height: 2px; background: var(--accent); }
+  .eyebrow { font: 500 0.75rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+  .deck { max-width: 1000px; margin: 0 auto; display: grid; gap: 20px; }
+  .slide { background: var(--surface); border: 1px solid var(--line); padding: clamp(24px, 5vw, 56px); display: grid; gap: 28px; align-content: start; min-width: 0; }
+  .slide > header { display: grid; gap: 10px; }
+
+  /* Cover */
+  .cover { background: var(--cover); color: var(--cover-ink); border-color: var(--cover); min-height: 420px; align-content: space-between; }
+  .cover .eyebrow { color: var(--cover-muted); }
+  .cover h1 { font-size: clamp(2.2rem, 6vw, 3.8rem); max-width: 16ch; }
+  .cover .for { font: 500 1.25rem var(--display); color: var(--cover-ink); }
+  .cover .meta { display: flex; flex-wrap: wrap; gap: 8px 40px; font: 400 0.85rem var(--mono); color: var(--cover-muted); }
+  .cover .meta b { display: block; color: var(--cover-ink); font-weight: 500; }
+  .cover .rule { width: 72px; height: 4px; background: var(--accent); margin-block: 18px 22px; }
+  :root[data-theme="dark"] .cover .rule, .cover .rule { background: #4FC3B6; }
+
+  /* Summary */
+  .lead { font-size: 1.2rem; line-height: 1.65; }
+  .glance { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); border: 1px solid var(--line); }
+  .glance > div { padding: 16px 18px; display: grid; gap: 4px; border-left: 1px solid var(--line); }
+  .glance > div:first-child { border-left: 0; }
+  .glance dt { font: 500 0.7rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .glance dd { margin: 0; font: 700 1.5rem var(--display); color: var(--accent); font-variant-numeric: tabular-nums; }
+  .glance { margin: 0; }
+
+  /* Scope */
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 32px; }
+  .cols > div { display: grid; gap: 14px; align-content: start; min-width: 0; }
+  .out li::before { background: var(--muted); }
+  .subtle { color: var(--muted); }
+
+  /* Timeline */
+  .gantt { display: grid; gap: 0; border-top: 1px solid var(--line); overflow-x: auto; }
+  .g-row { display: grid; grid-template-columns: minmax(130px, 190px) minmax(360px, 1fr); border-bottom: 1px solid var(--line); align-items: center; min-width: 0; }
+  .g-name { padding: 10px 12px 10px 0; font-weight: 600; font-size: 0.92rem; }
+  .track { display: grid; grid-template-columns: repeat(var(--n), 1fr); position: relative; padding-block: 8px;
+           background-image: repeating-linear-gradient(to right, var(--line) 0 1px, transparent 1px calc(100% / var(--n))); }
+  .bar { background: var(--accent); color: var(--accent-ink); border-radius: 3px; padding: 4px 8px; font: 500 0.72rem var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-inline: 2px; }
+  .g-head .track { padding-block: 6px; }
+  .g-head .wk { font: 400 0.7rem var(--mono); color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+  .table-wrap { overflow-x: auto; }
+  th { text-align: left; font: 500 0.72rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 10px 12px 10px 0; border-bottom: 2px solid var(--ink); }
+  td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; white-space: nowrap; }
+  td.when { font-family: var(--mono); font-size: 0.85rem; white-space: nowrap; color: var(--accent); }
+  tfoot td { border-bottom: 0; border-top: 2px solid var(--ink); font: 700 1.2rem var(--display); }
+
+  /* Closing */
+  .sign { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px; margin-top: 12px; }
+  .sign div { border-top: 1px solid var(--ink); padding-top: 8px; font-size: 0.85rem; color: var(--muted); }
+  .steps { counter-reset: step; }
+  .steps li { padding-left: 2.2rem; }
+  .steps li::before { counter-increment: step; content: counter(step); background: none; top: 0; width: auto; height: auto; font: 500 0.85rem var(--mono); color: var(--accent); }
+
+  /* Editing */
+  .toolbar { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; max-width: 1000px; margin: 0 auto 16px; padding: 10px 14px; background: var(--ink); color: var(--bg); font: 500 0.82rem var(--body); }
+  .toolbar span { flex: 1 1 220px; }
+  .toolbar button { font: 600 0.82rem var(--body); padding: 7px 14px; border: 1px solid var(--bg); background: transparent; color: var(--bg); cursor: pointer; }
+  .toolbar button.primary { background: var(--bg); color: var(--ink); }
+  .toolbar button:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .toolbar button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  [contenteditable="true"] :is(p, li, h1, h2, h3, td, th, dd, .for, .meta b):hover { outline: 1px dashed var(--accent); outline-offset: 3px; cursor: text; }
+  [contenteditable="true"] :is(p, li, h1, h2, h3, td, th, dd, .for, .meta b):focus { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  @media (max-width: 640px) { .cover { min-height: 340px; } .g-row { grid-template-columns: 120px minmax(320px, 1fr); } }
+  @media print {
+    :root, :root[data-theme] { --bg: #fff; --surface: #fff; --ink: #14202B; --muted: #5B6B79; --line: #DCE2E8; --accent: #0B6B63; --accent-ink: #fff; --accent-soft: #DDF0EE; --cover: #0E2A33; }
+    body { background: #fff; padding: 0; font-size: 12pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .deck { gap: 0; max-width: none; }
+    .slide { border: 0; break-after: page; padding: 28px 8px; }
+    .cover { min-height: 90vh; }
+    .no-export { display: none !important; }
+  }
+  @media (prefers-reduced-motion: no-preference) { .toolbar button { transition: background 0.15s; } }
+</style>
+</head>
+<body>
+{% if editable %}
+<div class="toolbar no-export" id="toolbar">
+  <span>Click any text to edit it. Edits here are not saved back to the app until you download.</span>
+  <button class="primary" type="button" id="btn-download">Download HTML</button>
+  <button type="button" id="btn-pdf">Save as PDF</button>
+  <button type="button" id="btn-reset">Reset</button>
+</div>
+{% endif %}
+<main class="deck" id="doc"{% if editable %} contenteditable="true" spellcheck="true"{% endif %}>
+
+  <section class="slide cover">
+    <div>
+      <div class="eyebrow">Proposal &amp; Scope of Work</div>
+      <div class="rule"></div>
+      <h1>{{ p.title }}</h1>
+      <p class="for">Prepared for {{ p.client }}</p>
+    </div>
+    <div class="meta">
+      <div>Prepared by<b>{{ p.prepared_by }}</b></div>
+      <div>Date<b>{{ p.prepared_on }}</b></div>
+      <div>Valid until<b>{{ p.valid_until }}</b></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <header><div class="eyebrow">Executive summary</div><h2>What we will do, and why</h2></header>
+    <p class="lead">{{ p.summary }}</p>
+    <dl class="glance">
+      <div><dt>Timeline</dt><dd>{{ weeks }} week{{ '' if weeks == 1 else 's' }}</dd></div>
+      <div><dt>Deliverables</dt><dd>{{ p.deliverables | length }}</dd></div>
+      <div><dt>Investment</dt><dd>{{ price_total }}</dd></div>
+    </dl>
+    {% if p.goals %}
+    <div>
+      <h3>Project goals</h3>
+      <ul style="margin-top:12px">{% for g in p.goals %}<li>{{ g }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="slide">
+    <header><div class="eyebrow">Scope of work</div><h2>What is included, and what is not</h2></header>
+    <div class="cols">
+      <div>
+        <h3>Included</h3>
+        <ul>{% for i in p.scope_in %}<li>{{ i }}</li>{% endfor %}</ul>
+      </div>
+      <div class="out">
+        <h3>Not included</h3>
+        <ul>{% for i in p.scope_out %}<li>{{ i }}</li>{% endfor %}</ul>
+      </div>
+    </div>
+    {% if p.assumptions %}
+    <div>
+      <h3>Assumptions</h3>
+      <ul style="margin-top:12px" class="subtle">{% for i in p.assumptions %}<li>{{ i }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="slide">
+    <header><div class="eyebrow">Timeline &amp; milestones</div><h2>{{ weeks }} week{{ '' if weeks == 1 else 's' }}, {{ p.milestones | length }} phase{{ '' if p.milestones | length == 1 else 's' }}</h2></header>
+    <div class="gantt" role="img" aria-label="Project timeline by week" style="--n: {{ gantt.n }}">
+      <div class="g-row g-head">
+        <div class="g-name eyebrow">Week</div>
+        <div class="track">{% for w in gantt.labels %}<div class="wk">{{ w.week if w.show else '' }}</div>{% endfor %}</div>
+      </div>
+      {% for m in gantt.rows %}
+      <div class="g-row">
+        <div class="g-name">{{ m.phase }}</div>
+        <div class="track"><div class="bar" style="grid-column: {{ m.col_start }} / {{ m.col_end }}" title="{{ m.label }}">{{ m.short }}</div></div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>When</th><th>Phase</th><th>What happens</th></tr></thead>
+        <tbody>
+          {% for m in gantt.rows %}
+          <tr><td class="when">{{ m.label }}</td><td><b>{{ m.phase }}</b></td><td>{{ m.description }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <header><div class="eyebrow">Investment</div><h2>{{ price_total }}</h2></header>
+    {% if has_price %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Phase</th><th class="num">{{ 'Estimate' if range_prices else 'Amount' }}</th></tr></thead>
+        <tbody>
+          {% for i in p.price_items %}
+          <tr><td>{{ i.item }}</td><td class="num">{% if i.low|round == i.high|round %}{{ i.low | money(p.currency) }}{% else %}{{ i.low | money(p.currency) }} – {{ i.high | money(p.currency) }}{% endif %}</td></tr>
+          {% endfor %}
+        </tbody>
+        <tfoot><tr><td>Total</td><td class="num">{{ price_total }}</td></tr></tfoot>
+      </table>
+    </div>
+    {% if p.payment_terms %}
+    <div><h3>Payment terms</h3><ul style="margin-top:12px">{% for t in p.payment_terms %}<li>{{ t }}</li>{% endfor %}</ul></div>
+    {% endif %}
+    {% else %}
+    <p>Pricing will be confirmed once the scope is agreed.</p>
+    {% endif %}
+  </section>
+
+  <section class="slide">
+    <header><div class="eyebrow">Next steps</div><h2>How we get started</h2></header>
+    {% if p.notes %}
+    <div><h3>Special considerations</h3><ul style="margin-top:12px">{% for n in p.notes %}<li>{{ n }}</li>{% endfor %}</ul></div>
+    {% endif %}
+    <ul class="steps">{% for s in p.next_steps %}<li>{{ s }}</li>{% endfor %}</ul>
+    <div class="sign">
+      <div>Accepted for {{ p.client }}<br>Name, signature and date</div>
+      <div>For {{ p.prepared_by }}<br>Name, signature and date</div>
+    </div>
+  </section>
+
+</main>
+{% if editable %}
+{% raw %}
+<script>
+(function () {
+  var stem = {% endraw %}{{ file_stem | tojson }}{% raw %};
+  function cleanHtml() {
+    var clone = document.documentElement.cloneNode(true);
+    clone.querySelectorAll('.no-export').forEach(function (e) { e.remove(); });
+    clone.querySelectorAll('[contenteditable]').forEach(function (e) {
+      e.removeAttribute('contenteditable'); e.removeAttribute('spellcheck');
+    });
+    return '<!doctype html>\n' + clone.outerHTML;
+  }
+  document.getElementById('btn-download').addEventListener('click', function () {
+    var blob = new Blob([cleanHtml()], { type: 'text/html' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = stem + '.html';
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+  document.getElementById('btn-pdf').addEventListener('click', function () { window.print(); });
+  document.getElementById('btn-reset').addEventListener('click', function () { location.reload(); });
+})();
+</script>
+{% endraw %}
+{% endif %}
+</body>
+</html>

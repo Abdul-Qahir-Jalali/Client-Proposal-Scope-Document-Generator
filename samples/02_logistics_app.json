@@ -1,0 +1,11 @@
+{
+  "sample_name": "Northwind Logistics: driver mobile app",
+  "client_name": "Northwind Logistics",
+  "project_type": "Mobile App Development",
+  "prepared_by": "Allure Digital",
+  "goals": "Give drivers one app for routes, proof of delivery and messages\nCut dispatcher phone calls by half\nShow customers live delivery status",
+  "deliverables": "iOS and Android app built with React Native\nDriver login and daily route list\nReal-time GPS tracking\nPhoto proof of delivery with signature capture\nAdmin dashboard for dispatchers\nPush notifications\nAPI documentation and handover session",
+  "timeline": "14 weeks",
+  "pricing": "$28,000 - $35,000",
+  "notes": "Northwind will provide access to its existing dispatch API in week 1\nApp store accounts are owned by Northwind"
+}
