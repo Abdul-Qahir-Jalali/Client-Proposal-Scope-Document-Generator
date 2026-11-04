@@ -9,3 +9,7 @@ coverage.xml
 .mypy_cache/
 .ruff_cache/
 .env
+
+# brag video working files (the finished video is in docs/assets/demo.mp4)
+brag-output/composition/.hyperframes/
+brag-output/composition/node_modules/

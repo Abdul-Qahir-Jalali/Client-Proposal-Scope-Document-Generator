@@ -2,17 +2,29 @@
 
 Turn a few project details into a finished client proposal: executive summary, scope of work,
 timeline and pricing. Edit every word live, then export to HTML, Word or PDF.
+It needs no API key and no internet to generate a proposal.
 
-![The app: project details on the left, editable content in the middle, live proposal preview on the right](docs/assets/app.png)
+[![Demo: details in, proposal out](docs/assets/demo.gif)](docs/assets/demo.mp4)
 
-## A finished proposal
+*Click the preview to watch the 24-second demo video ([`docs/assets/demo.mp4`](docs/assets/demo.mp4)).*
 
-![A six-section proposal: cover, executive summary, scope of work, timeline, investment, next steps](docs/assets/proposal-tour.gif)
+## What you get
 
-The proposal is one modern HTML page: a sticky navigation bar, a photo cover (chosen automatically from the project type) that draws the project's phases as a
-band, then full-width sections for the summary, scope, timeline, a dark Investment section with the total as the largest
-figure, terms, and a clear Accept section with signature fields. It follows your system light or dark theme, works on a
-phone, animates gently as you scroll (and not at all if you prefer reduced motion), and prints one section per page.
+The proposal is one modern HTML page, not a paper document:
+
+- **A photo cover.** A relevant photo is chosen automatically from the project type (website, app, marketing, branding or
+  general). The client name sits on it at poster size, with the project's phases drawn as a band.
+- **An opening quote.** A real, sourced quote with the person's name, chosen by project type. You can switch it off in the
+  *Edit content* tab.
+- **A sticky navigation bar** that always shows where you are, with a thin progress line.
+- **Full-width sections:** executive summary, scope of work (included, not included, assumptions), a timeline drawn as
+  bars, a dark *Investment* section with the total as the largest figure, terms, and an *Accept and next steps* section
+  with signature fields.
+- **Light and dark themes**, a phone layout, and gentle scroll animation (switched off if you prefer reduced motion).
+- **One section per page** when printed or saved as PDF, with the colour running to the paper edge.
+
+![A seven-page proposal: cover, summary, scope, timeline, investment, terms, accept](docs/assets/proposal-tour.gif)
+
 [`docs/sample-proposal.html`](docs/sample-proposal.html) is a real export. Download it and open it in a browser.
 
 ## Run it
@@ -28,7 +40,8 @@ python -m venv .venv
 On Mac or Linux, use `.venv/bin/pip` and `.venv/bin/python` in place of the `.venv\Scripts\` paths.
 
 The app opens at http://localhost:8501 empty, ready for your details. Press *Load sample* in the sidebar
-to see a finished proposal straight away. It needs no API key and no internet to generate a proposal. The HTML loads its fonts from Google Fonts when online.
+to see a finished proposal straight away. The page loads its fonts and its animation script from the internet when
+online; offline it falls back to system fonts and shows the page without animation.
 
 ## How to use it
 
@@ -58,18 +71,29 @@ Pressing *Generate proposal* again replaces your edits with a fresh draft.
 
 | Section | Built from |
 |---|---|
-| Executive summary | Client, goals, deliverables, timeline and price |
+| Opening quote | A sourced quote chosen by project type |
+| Executive summary | Client, goals, deliverables, timeline and phases |
 | Scope of work | Your deliverables, plus standard inclusions, exclusions and assumptions for the project type |
 | Timeline and milestones | Phases sized to your timeline, for websites, apps, marketing, branding or general projects |
-| Investment | Your price or range split across the phases, with payment terms |
+| Investment | Your price or range split across the phases, with each phase's share drawn as a bar |
+| Terms and Accept | Payment terms, your notes, next steps and signature fields |
 
 The text is template based, so read it and adjust it before it goes to a client.
+
+### How the photo and the quote are chosen
+
+The app reads the *Project type* and sorts it into one of five kinds (web, app, marketing, brand, general) with the same
+keyword matching it uses for timelines and prices. Each kind has one photo (`proposal/assets/hero/`) and a short list of
+quotes (`proposal/quotes.py`). The photo is embedded in the HTML, so an exported file works offline and in email.
+To change a photo, replace the file of the same name. Photo credits are in
+[`proposal/assets/hero/CREDITS.md`](proposal/assets/hero/CREDITS.md). Only add quotes whose wording and source you have
+verified.
 
 ## Exporting
 
 | Format | How |
 |---|---|
-| HTML | Download from the *Export* tab. A single file you can email or host. |
+| HTML | Download from the *Export* tab. A single self-contained file you can email or host. |
 | Word | Download the .docx from the *Export* tab. Fully editable. |
 | PDF | Press *Create PDF*. It uses Chrome or Edge already on your computer and takes a few seconds. With neither installed, open the HTML and use Print, then Save as PDF. |
 
@@ -84,6 +108,8 @@ To add your own, drop another `.json` file in that folder with the same fields.
 app.py                   Streamlit interface and live-editing state
 proposal/generator.py    Parsing, phase and price templates, proposal builder
 proposal/render.py       HTML rendering
+proposal/imagery.py      Chooses the cover photo from the project type
+proposal/quotes.py       The sourced opening quotes
 proposal/docx_export.py  Word export
 proposal/pdf_export.py   PDF export through headless Chrome or Edge
 proposal/limits.py       Input limits, validation and rate limiting
@@ -92,12 +118,14 @@ proposal/health.py       Self-check: python -m proposal.health
 templates/               The HTML proposal template
 samples/                 Demo inputs
 tests/                   Test suite
-docs/                    README images and a sample export
+docs/                    README images, the demo video and a sample export
+DESIGN.md, PRODUCT.md    The design system and the product notes behind the look
 ```
 
 ## Development
 
-Install the exact pinned versions, then run the same checks that CI runs on every push:
+Install the exact pinned versions, then run the same checks that CI runs on every push
+(lint, format, types, tests with a coverage minimum, a health check and a dependency vulnerability scan):
 
 ```bash
 .venv\Scripts\python.exe -m pip install -r requirements.txt -r requirements-dev.txt
@@ -130,3 +158,11 @@ Health check (exit code 0 = healthy): `python -m proposal.health`. The Streamlit
 ## Safe by design
 
 Everything you type is escaped in the HTML output, so pasted markup cannot run as code. A test covers this.
+The motion script is an enhancement only: nothing is hidden by CSS, so the page reads fully with no script, offline,
+in print and in the PDF.
+
+## Credits
+
+- Cover photos: free-to-use photos from [Unsplash](https://unsplash.com/license) (see the credits file above).
+- Demo video: made with [HyperFrames](https://hyperframes.studio) from real renders of the app. Music: Sascha Ende,
+  [ende.app](https://ende.app/en) (CC BY 4.0).

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Client Proposal &amp; Scope Document Generator</title>
+<style>
+  @font-face { font-family: 'Familjen Grotesk'; font-weight: 500; src: url('assets/fonts/FamiljenGrotesk-500.woff2') format('woff2'); }
+  @font-face { font-family: 'Familjen Grotesk'; font-weight: 600; src: url('assets/fonts/FamiljenGrotesk-600.woff2') format('woff2'); }
+  @font-face { font-family: 'Familjen Grotesk'; font-weight: 700; src: url('assets/fonts/FamiljenGrotesk-700.woff2') format('woff2'); }
+  @font-face { font-family: 'Hanken Grotesk'; font-weight: 400; src: url('assets/fonts/HankenGrotesk-400.woff2') format('woff2'); }
+  @font-face { font-family: 'Hanken Grotesk'; font-weight: 500; src: url('assets/fonts/HankenGrotesk-500.woff2') format('woff2'); }
+  @font-face { font-family: 'Hanken Grotesk'; font-weight: 600; src: url('assets/fonts/HankenGrotesk-600.woff2') format('woff2'); }
+  @font-face { font-family: 'Hanken Grotesk'; font-weight: 700; src: url('assets/fonts/HankenGrotesk-700.woff2') format('woff2'); }
+
+  :root { --navy: #0A0F3C; --cobalt: #2B44FF; --canvas: #F5F6FB; --ink: #0E1230; --muted: #565C7A; --line: #E1E4F0; --tang: #FF7A1A; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+  body { font-family: 'Hanken Grotesk', system-ui, sans-serif; }
+  #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+  .scene { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; }
+  .navy { background: var(--navy); }
+  .cobalt { background: var(--cobalt); }
+  .canvas { background: var(--canvas); }
+  .display { font-family: 'Familjen Grotesk', system-ui, sans-serif; font-weight: 700; letter-spacing: -0.035em; }
+
+  /* Scene 1: details in */
+  #s1 h1 { position: absolute; left: 140px; top: 300px; width: 760px; color: #fff; font-size: 112px; line-height: 1.02; }
+  .card { position: absolute; left: 1010px; top: 130px; width: 780px; height: 820px; background: #fff; border-radius: 28px; padding: 48px 52px; box-shadow: 0 50px 90px -40px rgba(0, 0, 0, 0.6); }
+  .card .cap { font-size: 28px; font-weight: 600; color: var(--muted); margin-bottom: 26px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 28px; font-weight: 500; color: var(--muted); margin-bottom: 8px; }
+  .field .box { height: 68px; border: 2px solid var(--line); border-radius: 14px; padding: 0 22px; display: flex; align-items: center; font-size: 32px; font-weight: 500; color: var(--ink); white-space: pre; background: #FAFBFF; }
+  .field .box span { opacity: 0; }
+  .go { position: absolute; left: 52px; right: 52px; bottom: 48px; height: 84px; border-radius: 999px; background: var(--cobalt); color: #fff; font-size: 32px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+
+  /* Scenes 2-5: real screens in a window */
+  .cap2 { position: absolute; left: 255px; top: 50px; font-size: 56px; line-height: 1.05; }
+  .win { position: absolute; left: 255px; width: 1409px; border-radius: 20px; overflow: hidden; box-shadow: 0 50px 90px -40px rgba(0, 0, 0, 0.55); background: #fff; }
+  .win img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .on-dark { color: #fff; }
+  .on-light { color: var(--ink); }
+  #s3 .win, #s5 .win { box-shadow: 0 40px 80px -40px rgba(14, 18, 48, 0.45); }
+
+  /* Scene 6: export */
+  #s6 h2 { position: absolute; left: 140px; top: 190px; width: 1500px; color: #fff; font-size: 150px; line-height: 1; }
+  .pills { position: absolute; left: 140px; top: 600px; display: flex; gap: 36px; }
+  .pill { width: 380px; height: 170px; border-radius: 999px; background: #fff; color: var(--navy); font-size: 72px; line-height: 170px; text-align: center; }
+
+  /* Scene 7: outro */
+  #s7 h2 { position: absolute; left: 140px; top: 270px; width: 1500px; color: #fff; font-size: 110px; line-height: 1.04; }
+  #s7 .bar { position: absolute; left: 140px; top: 640px; width: 150px; height: 8px; background: var(--tang); border-radius: 4px; transform-origin: left center; }
+  #s7 p { position: absolute; left: 140px; top: 690px; width: 1500px; color: #D6DCFF; font-size: 46px; font-weight: 500; line-height: 1.25; }
+  #s7 small { position: absolute; left: 140px; bottom: 56px; color: #A9B2E8; font-size: 28px; font-weight: 500; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="root" data-width="1920" data-height="1080" data-start="0" data-duration="24">
+
+  <!-- 1. Details in -->
+  <section class="scene navy clip" id="s1" data-start="0" data-duration="4.5" style="z-index:1">
+    <h1 class="display" id="hook">A few project details.</h1>
+    <div class="card" id="card">
+      <div class="cap">Project details</div>
+      <div class="field"><label>Client name</label><div class="box" id="f1" data-text="Bright Dental Clinic"></div></div>
+      <div class="field"><label>Project type</label><div class="box" id="f2" data-text="Website Redesign"></div></div>
+      <div class="field"><label>Timeline</label><div class="box" id="f3" data-text="8 weeks"></div></div>
+      <div class="field"><label>Pricing or range</label><div class="box" id="f4" data-text="$6,500 - $8,000"></div></div>
+      <div class="go" id="go">Generate proposal</div>
+    </div>
+  </section>
+
+  <!-- 2. Proposal out -->
+  <section class="scene cobalt clip" id="s2" data-start="4.1" data-duration="4.5" style="z-index:2">
+    <div class="cap2 display on-dark" id="c2" data-layout-allow-overlap>A finished client proposal.</div>
+    <div class="win" id="w2" style="top:150px;height:900px"><img src="assets/shots/cover.jpg" alt="The proposal cover"></div>
+  </section>
+
+  <!-- 3. The quote -->
+  <section class="scene canvas clip" id="s3" data-start="8.22" data-duration="3.65" style="z-index:3">
+    <div class="cap2 display on-light" id="c3" data-layout-allow-overlap>Opens with a real, sourced quote.</div>
+    <div class="win" id="w3" style="top:240px;height:685px"><img src="assets/shots/quote.png" alt="The opening quote"></div>
+  </section>
+
+  <!-- 4. The timeline -->
+  <section class="scene navy clip" id="s4" data-start="11.47" data-duration="3.66" style="z-index:4">
+    <div class="cap2 display on-dark" id="c4" data-layout-allow-overlap>The timeline, drawn from your phases.</div>
+    <div class="win" id="w4" style="top:200px;height:744px"><img src="assets/shots/timeline.png" alt="The timeline"></div>
+  </section>
+
+  <!-- 5. The price -->
+  <section class="scene canvas clip" id="s5" data-start="14.73" data-duration="3.68" style="z-index:5">
+    <div class="cap2 display on-light" id="c5" data-layout-allow-overlap>The price, in one look.</div>
+    <div class="win" id="w5" style="top:150px;height:881px"><img src="assets/shots/invest.png" alt="The price section"></div>
+  </section>
+
+  <!-- 6. Export -->
+  <section class="scene cobalt clip" id="s6" data-start="18.01" data-duration="3.13" style="z-index:6">
+    <h2 class="display" id="h6" data-layout-allow-overlap>Edit every word live.</h2>
+    <div class="pills display">
+      <div class="pill" id="p1">HTML</div>
+      <div class="pill" id="p2">Word</div>
+      <div class="pill" id="p3">PDF</div>
+    </div>
+  </section>
+
+  <!-- 7. Outro -->
+  <section class="scene navy clip" id="s7" data-start="20.74" data-duration="3.26" style="z-index:7">
+    <h2 class="display" id="h7">Client Proposal &amp; Scope Document Generator</h2>
+    <div class="bar" id="bar7"></div>
+    <p id="t7">No API key. No internet to generate a proposal.</p>
+    <small id="cr7">Music: Sascha Ende, ende.app (CC BY 4.0)</small>
+  </section>
+
+  <!-- Audio: warm music bed, then sparse motion-matched accents -->
+  <audio id="music" src="assets/music/happy-beats-business-moves-vol-10-by-ende-dot-app.mp3" data-start="0" data-duration="24" data-volume="0.5" data-fade-out="1.5"></audio>
+  <audio id="k1" src="assets/sfx/keypress-001.wav" data-start="0.82" data-duration="0.3" data-volume="0.45"></audio>
+  <audio id="k2" src="assets/sfx/keypress-003.wav" data-start="1.9" data-duration="0.3" data-volume="0.45"></audio>
+  <audio id="k3" src="assets/sfx/keypress-001.wav" data-start="2.66" data-duration="0.3" data-volume="0.45"></audio>
+  <audio id="k4" src="assets/sfx/keypress-003.wav" data-start="3.01" data-duration="0.3" data-volume="0.45"></audio>
+  <audio id="clk" src="assets/sfx/click2.ogg" data-start="3.55" data-duration="0.3" data-volume="0.6"></audio>
+  <audio id="i1" src="assets/sfx/impactSoft_medium_001.ogg" data-start="4.1" data-duration="0.4" data-volume="0.55"></audio>
+  <audio id="b1" src="assets/sfx/bong_001.ogg" data-start="8.22" data-duration="0.3" data-volume="0.35"></audio>
+  <audio id="i2" src="assets/sfx/impactSoft_medium_001.ogg" data-start="18.01" data-duration="0.4" data-volume="0.55"></audio>
+  <audio id="c1" src="assets/sfx/click_003.ogg" data-start="18.55" data-duration="0.2" data-volume="0.6"></audio>
+  <audio id="c2s" src="assets/sfx/click_003.ogg" data-start="19.1" data-duration="0.2" data-volume="0.6"></audio>
+  <audio id="c3s" src="assets/sfx/click_003.ogg" data-start="19.64" data-duration="0.2" data-volume="0.6"></audio>
+  <audio id="i3" src="assets/sfx/impactSoft_medium_001.ogg" data-start="20.74" data-duration="0.4" data-volume="0.6"></audio>
+</div>
+
+<script src="assets/gsap.min.js"></script>
+<script>
+  // Premium motion: decelerating, no overshoot. Scene cuts are crossfades that start on the beat.
+  const tl = gsap.timeline({ paused: true });
+  const E = "power2.out";
+
+  // Build the typed text as one span per character (revealed with set/to, so seeking stays deterministic).
+  ["f1", "f2", "f3", "f4"].forEach(function (id) {
+    const box = document.getElementById(id);
+    box.innerHTML = Array.from(box.dataset.text).map(function (ch) { return "<span>" + (ch === " " ? "&nbsp;" : ch) + "</span>"; }).join("");
+  });
+  const type = function (id, start, gap) { tl.to("#" + id + " span", { opacity: 1, duration: 0.01, stagger: gap }, start); };
+
+  // ---- Scene 1: details in (0 - 4.1)
+  tl.from("#hook", { y: 26, duration: 0.7, ease: E }, 0);   // on screen from frame 0 (it is the thumbnail)
+  tl.from("#card", { opacity: 0, y: 40, duration: 0.7, ease: E }, 0.27);   // beat-grid: 0.27
+  type("f1", 0.82, 0.04);   // beat-grid: 0.82
+  type("f2", 1.9, 0.04);    // beat-grid: 1.90
+  type("f3", 2.66, 0.05);
+  type("f4", 3.01, 0.03);   // beat-grid: 3.01
+  tl.to("#go", { scale: 0.96, duration: 0.08, ease: "power1.in" }, 3.55);   // beat-grid: 3.55 (the click)
+  tl.to("#go", { scale: 1, background: "#1B2BC8", duration: 0.25, ease: E }, 3.63);
+
+  // ---- Scene 2: proposal out (4.10 - 8.22)   // beat-locked: 4.10s
+  tl.fromTo("#s2", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power1.out" }, 4.1);
+  tl.from("#w2", { y: 60, scale: 1.04, duration: 0.9, ease: E }, 4.1);
+  tl.from("#c2", { opacity: 0, y: 20, duration: 0.6, ease: E }, 4.35);
+  tl.to("#w2", { scale: 1.03, duration: 3.2, ease: "none" }, 5.0);
+
+  // ---- Scene 3: the quote (8.22 - 11.47)   // beat-grid: 8.22
+  tl.fromTo("#s3", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power1.out" }, 8.22);
+  tl.from("#w3", { y: 50, duration: 0.8, ease: E }, 8.22);
+  tl.from("#c3", { opacity: 0, y: 20, duration: 0.6, ease: E }, 8.45);
+
+  // ---- Scene 4: the timeline (11.47 - 14.73)   // beat-grid: 11.47
+  tl.fromTo("#s4", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power1.out" }, 11.47);
+  tl.from("#w4", { y: 50, duration: 0.8, ease: E }, 11.47);
+  tl.from("#c4", { opacity: 0, y: 20, duration: 0.6, ease: E }, 11.7);
+
+  // ---- Scene 5: the price (14.73 - 18.01)   // beat-grid: 14.73
+  tl.fromTo("#s5", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power1.out" }, 14.73);
+  tl.from("#w5", { y: 50, duration: 0.8, ease: E }, 14.73);
+  tl.from("#c5", { opacity: 0, y: 20, duration: 0.6, ease: E }, 14.96);
+
+  // ---- Scene 6: export (18.01 - 20.74)   // beat-locked: 18.01s (strong cue)
+  tl.fromTo("#s6", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power1.out" }, 18.01);
+  tl.from("#h6", { opacity: 0, y: 30, duration: 0.6, ease: E }, 18.1);
+  tl.from("#p1", { opacity: 0, y: 24, scale: 0.85, duration: 0.4, ease: E }, 18.55);   // beat-grid: pill 1 at 18.55
+  tl.from("#p2", { opacity: 0, y: 24, scale: 0.85, duration: 0.4, ease: E }, 19.1);    // beat-grid: pill 2 at 19.10
+  tl.from("#p3", { opacity: 0, y: 24, scale: 0.85, duration: 0.4, ease: E }, 19.64);   // beat-grid: pill 3 at 19.64
+
+  // ---- Scene 7: outro (20.74 - 24)   // beat-locked: 20.74s (strong cue)
+  tl.fromTo("#s7", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power1.out" }, 20.74);
+  tl.from("#h7", { opacity: 0, y: 30, duration: 0.7, ease: E }, 20.8);
+  tl.from("#bar7", { scaleX: 0, duration: 0.6, ease: E }, 21.35);
+  tl.from("#t7", { opacity: 0, y: 18, duration: 0.6, ease: E }, 21.45);
+  tl.from("#cr7", { opacity: 0, duration: 0.5, ease: "power1.out" }, 21.4);
+
+  window.__timelines = window.__timelines || {};
+  window.__timelines["root"] = tl;
+</script>
+</body>
+</html>

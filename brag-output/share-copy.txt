@@ -1,0 +1,1 @@
+Made a proposal generator: type a few project details, get a finished client proposal with a photo cover, a sourced quote, a timeline and a price section. Edit every word live, then export to HTML, Word or PDF.
