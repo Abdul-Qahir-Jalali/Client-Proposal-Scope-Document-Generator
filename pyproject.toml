@@ -1,0 +1,63 @@
+[project]
+name = "proposal-generator"
+version = "0.2.0"
+description = "Client Proposal & Scope Document Generator"
+requires-python = ">=3.11"
+
+# ------------------------------------------------------------------ tests
+[tool.pytest.ini_options]
+testpaths = ["tests"]                    # never collect the backup copies in the project folder
+addopts = "-ra --import-mode=importlib"
+filterwarnings = ["ignore::DeprecationWarning:docx.*"]
+
+[tool.coverage.run]
+source = ["proposal"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
+skip_covered = false
+
+# ------------------------------------------------------------------ lint and format (ruff)
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["REPOSITORY-backup.git", "REPOSITORY-clean", ".claude", "docs", ".venv", "logs"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",    # pycodestyle
+    "F",         # pyflakes: unused imports and variables, undefined names
+    "I",         # import order
+    "B",         # bugbear: likely bugs
+    "UP",        # newer Python syntax
+    "S",         # security checks (bandit rules)
+    "C4",        # simpler comprehensions
+    "SIM",       # simpler code
+    "RET",       # return statements
+    "PT",        # pytest style
+]
+ignore = [
+    "S101",      # assert is fine in tests
+    "E501",      # long lines are handled by the formatter where possible
+    "SIM108",
+    "PT006", "PT018",   # test style: tuple argnames, one assert per line
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "B017", "PT011"]
+"proposal/pdf_export.py" = ["S603"]      # we run a browser we located ourselves, with fixed arguments
+
+[tool.ruff.format]
+quote-style = "double"
+
+# ------------------------------------------------------------------ types (mypy)
+[tool.mypy]
+python_version = "3.11"
+files = ["proposal", "app.py"]
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+check_untyped_defs = true
+ignore_missing_imports = true

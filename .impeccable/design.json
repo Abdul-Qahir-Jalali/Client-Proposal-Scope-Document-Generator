@@ -1,0 +1,505 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-04T14:47:29+00:00",
+  "title": "Design System: Client Proposal Web Page",
+  "extensions": {
+    "colorMeta": {
+      "cobalt": {
+        "role": "primary",
+        "displayName": "Cobalt",
+        "canonical": "#2B44FF",
+        "tonalRamp": [
+          "#0D144C",
+          "#162280",
+          "#1D2EAB",
+          "#2438D4",
+          "#2B44FF",
+          "#6073FF",
+          "#95A2FF",
+          "#CAD0FF"
+        ]
+      },
+      "cobalt-deep": {
+        "role": "primary",
+        "displayName": "Cobalt Deep",
+        "canonical": "#1B2BC8",
+        "tonalRamp": [
+          "#080D3C",
+          "#0E1664",
+          "#121D86",
+          "#1624A6",
+          "#1B2BC8",
+          "#5460D6",
+          "#8D95E4",
+          "#C6CAF1"
+        ]
+      },
+      "navy": {
+        "role": "primary",
+        "displayName": "Navy",
+        "canonical": "#0A0F3C",
+        "tonalRamp": [
+          "#030412",
+          "#05081E",
+          "#070A28",
+          "#080C32",
+          "#0A0F3C",
+          "#474B6D",
+          "#84879E",
+          "#C2C3CE"
+        ]
+      },
+      "tang": {
+        "role": "primary",
+        "displayName": "Tangerine",
+        "canonical": "#FF7A1A",
+        "tonalRamp": [
+          "#4C2508",
+          "#803D0D",
+          "#AB5211",
+          "#D46516",
+          "#FF7A1A",
+          "#FF9B53",
+          "#FFBC8C",
+          "#FFDEC6"
+        ]
+      },
+      "peach": {
+        "role": "secondary",
+        "displayName": "Peach",
+        "canonical": "#FFB27A",
+        "tonalRamp": [
+          "#4C3525",
+          "#80593D",
+          "#AB7752",
+          "#D49465",
+          "#FFB27A",
+          "#FFC59B",
+          "#FFD8BC",
+          "#FFECDE"
+        ]
+      },
+      "periwinkle": {
+        "role": "secondary",
+        "displayName": "Periwinkle",
+        "canonical": "#8294FF",
+        "tonalRamp": [
+          "#272C4C",
+          "#414A80",
+          "#5763AB",
+          "#6C7BD4",
+          "#8294FF",
+          "#A1AFFF",
+          "#C0CAFF",
+          "#E0E4FF"
+        ]
+      },
+      "lilac": {
+        "role": "secondary",
+        "displayName": "Lilac",
+        "canonical": "#D6DCFF",
+        "tonalRamp": [
+          "#40424C",
+          "#6B6E80",
+          "#8F93AB",
+          "#B2B7D4",
+          "#D6DCFF",
+          "#E0E5FF",
+          "#EAEEFF",
+          "#F5F6FF"
+        ]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Canvas",
+        "canonical": "#F5F6FB",
+        "tonalRamp": [
+          "#4A4A4B",
+          "#7A7B7E",
+          "#A4A5A8",
+          "#CBCCD0",
+          "#F5F6FB",
+          "#F8F8FC",
+          "#FAFAFD",
+          "#FCFDFE"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#4C4C4C",
+          "#808080",
+          "#ABABAB",
+          "#D4D4D4",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF"
+        ]
+      },
+      "tint": {
+        "role": "neutral",
+        "displayName": "Tint",
+        "canonical": "#ECEFFF",
+        "tonalRamp": [
+          "#47484C",
+          "#767880",
+          "#9EA0AB",
+          "#C4C6D4",
+          "#ECEFFF",
+          "#F1F3FF",
+          "#F6F7FF",
+          "#FAFBFF"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#0E1230",
+        "tonalRamp": [
+          "#04050E",
+          "#070918",
+          "#090C20",
+          "#0C0F28",
+          "#0E1230",
+          "#4A4D64",
+          "#868898",
+          "#C3C4CB"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "#565C7A",
+        "tonalRamp": [
+          "#1A1C25",
+          "#2B2E3D",
+          "#3A3E52",
+          "#474C65",
+          "#565C7A",
+          "#80859B",
+          "#AAAEBC",
+          "#D5D6DE"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "canonical": "#E1E4F0",
+        "tonalRamp": [
+          "#444448",
+          "#707278",
+          "#9799A1",
+          "#BBBDC7",
+          "#E1E4F0",
+          "#E8EBF4",
+          "#F0F2F8",
+          "#F8F8FB"
+        ]
+      },
+      "canvas-night": {
+        "role": "neutral",
+        "displayName": "Night Canvas",
+        "canonical": "#0A0D1F",
+        "tonalRamp": [
+          "#030409",
+          "#050610",
+          "#070915",
+          "#080B1A",
+          "#0A0D1F",
+          "#474A57",
+          "#84868F",
+          "#C2C2C7"
+        ]
+      },
+      "surface-night": {
+        "role": "neutral",
+        "displayName": "Night Surface",
+        "canonical": "#11152B",
+        "tonalRamp": [
+          "#05060D",
+          "#080A16",
+          "#0B0E1D",
+          "#0E1124",
+          "#11152B",
+          "#4C5060",
+          "#888A95",
+          "#C4C4CA"
+        ]
+      },
+      "tint-night": {
+        "role": "neutral",
+        "displayName": "Night Tint",
+        "canonical": "#171C3A",
+        "tonalRamp": [
+          "#070811",
+          "#0C0E1D",
+          "#0F1327",
+          "#131730",
+          "#171C3A",
+          "#51556B",
+          "#8B8E9C",
+          "#C5C6CE"
+        ]
+      },
+      "ink-night": {
+        "role": "neutral",
+        "displayName": "Night Ink",
+        "canonical": "#ECEFFF",
+        "tonalRamp": [
+          "#47484C",
+          "#767880",
+          "#9EA0AB",
+          "#C4C6D4",
+          "#ECEFFF",
+          "#F1F3FF",
+          "#F6F7FF",
+          "#FAFBFF"
+        ]
+      },
+      "muted-night": {
+        "role": "neutral",
+        "displayName": "Night Muted",
+        "canonical": "#A2A9C8",
+        "tonalRamp": [
+          "#31333C",
+          "#515464",
+          "#6D7186",
+          "#868CA6",
+          "#A2A9C8",
+          "#B9BED6",
+          "#D0D4E4",
+          "#E8EAF1"
+        ]
+      },
+      "line-night": {
+        "role": "neutral",
+        "displayName": "Night Line",
+        "canonical": "#262C4A",
+        "tonalRamp": [
+          "#0B0D16",
+          "#131625",
+          "#191D32",
+          "#20253D",
+          "#262C4A",
+          "#5C6177",
+          "#9296A4",
+          "#C9CAD2"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Hero Name",
+        "purpose": "Client name in the hero (700, clamp 2.8rem to 8rem, -0.045em, max 14ch)."
+      },
+      "headline": {
+        "displayName": "Section Heading",
+        "purpose": "Each section's h2 (600, clamp 2.4rem to 4.2rem, tight tracking)."
+      },
+      "title": {
+        "displayName": "Goal Line",
+        "purpose": "Goals (500, clamp 1.45rem to 2.1rem), Accept deal line, no-price sentence, h3 column headings (1.5rem)."
+      },
+      "total": {
+        "displayName": "Investment Total",
+        "purpose": "The largest figure (700, clamp 2.4rem to 5rem, -0.04em), tangerine on the navy Investment section."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text and tables, Hanken Grotesk 17px; lead paragraph 1.3rem."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Sentence-case labels (Hanken Grotesk 500-600, 0.82-0.95rem, untracked): nav links, table headers, hero facts, signature headings."
+      },
+      "step-numeral": {
+        "displayName": "Step Numeral",
+        "purpose": "Accept step numerals, Familjen Grotesk 700, 3rem, accent (cobalt; periwinkle in dark)."
+      }
+    },
+    "shadows": [
+      {
+        "name": "none",
+        "value": "none",
+        "purpose": "Flat: depth comes from ground changes, tone-on-tone shapes and 1px lines. Any shadow is soft and offset; print has none."
+      }
+    ],
+    "motion": [
+      {
+        "name": "personality",
+        "value": "Premium: GSAP 3.12.5 + ScrollTrigger (cdnjs, integrity hashes), ease power2.out, no overshoot",
+        "purpose": "Enhancement only: CSS hides nothing except a 1.8s release-guarded hold on the hero; reduced motion, print and offline show the static page; print forces [data-m] visible."
+      },
+      {
+        "name": "hero-sequence",
+        "value": "name 0.7s, title 0.5s, band segments clip-path wipe 0.6s stagger 0.1, then legend and facts",
+        "purpose": "Opening sequence of the hero."
+      },
+      {
+        "name": "heading-rise",
+        "value": "rise on scroll",
+        "purpose": "Each section heading when its section is reached."
+      },
+      {
+        "name": "stagger",
+        "value": "goals and steps staggered",
+        "purpose": "Goal lines and Accept steps."
+      },
+      {
+        "name": "wipe",
+        "value": "clip-path wipe",
+        "purpose": "Gantt bars and the share bar."
+      },
+      {
+        "name": "total-fade",
+        "value": "fade up, last",
+        "purpose": "The Investment total."
+      },
+      {
+        "name": "progress",
+        "value": "scaleX with scroll",
+        "purpose": "Tangerine progress line on the nav bar and the current-link highlight follow the scroll."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "split",
+        "value": "860px",
+        "purpose": "The two-column summary split stacks."
+      },
+      {
+        "name": "phone",
+        "value": "720px",
+        "purpose": "Nav links scroll with an edge fade and the brand hides; the milestones table becomes stacked rows; Gantt text hides."
+      },
+      {
+        "name": "wrap",
+        "value": "1120px",
+        "purpose": "Maximum reading column width."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Navigation Bar",
+      "kind": "nav",
+      "refersTo": "nav-bar",
+      "description": "Sticky navy bar with client name, pill links (current one filled white) and a tangerine progress line.",
+      "html": "<div class=\"ds-nav\"><b>Acme Dental</b><span><a href=\"#\">Summary</a><a class=\"on\" href=\"#\">Scope</a><a href=\"#\">Timeline</a><a href=\"#\">Investment</a></span><i></i></div>",
+      "css": ".ds-nav{position:relative;height:60px;background:#0A0F3C;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-family:'Hanken Grotesk',system-ui,sans-serif}.ds-nav b{font:600 1.05rem/1 'Familjen Grotesk',system-ui,sans-serif}.ds-nav span{display:flex;gap:2px}.ds-nav a{padding:9px 14px;border-radius:999px;text-decoration:none;font:500 .92rem/1 'Hanken Grotesk',system-ui,sans-serif;color:#C9D0FF}.ds-nav a.on{background:#fff;color:#0A0F3C}.ds-nav a:focus-visible{outline:2px solid #FF7A1A;outline-offset:2px}.ds-nav i{position:absolute;left:0;bottom:0;height:3px;width:40%;background:#FF7A1A}"
+    },
+    {
+      "name": "Hero",
+      "kind": "card",
+      "refersTo": "hero",
+      "description": "Cobalt ground, poster-scale name, lilac title, data-made phase band, facts, one tone-on-tone circle.",
+      "html": "<div class=\"ds-hero\"><h1>Acme Dental</h1><p>Website Redesign Proposal</p><div class=\"ds-band\"><i></i><i></i><i></i><i></i></div><dl><div><dt>Prepared by</dt><dd>Allure Digital</dd></div><div><dt>Investment</dt><dd>$12,400</dd></div></dl></div>",
+      "css": ".ds-hero{position:relative;overflow:hidden;background:#2B44FF;color:#fff;padding:48px 32px 32px;display:grid;gap:24px;font-family:'Hanken Grotesk',system-ui,sans-serif}.ds-hero::after{content:'';position:absolute;width:280px;aspect-ratio:1;border-radius:50%;background:#1B2BC8;right:-80px;top:-60px}.ds-hero>*{position:relative;z-index:1;margin:0}.ds-hero h1{font:700 3rem/.94 'Familjen Grotesk',system-ui,sans-serif;letter-spacing:-.045em}.ds-hero p{font:500 1.3rem/1.2 'Familjen Grotesk',system-ui,sans-serif;color:#D6DCFF}.ds-band{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;height:20px}.ds-band i{border-radius:6px;background:#fff}.ds-band i:nth-child(2){background:#C4CCFF}.ds-band i:nth-child(3){background:#97A6FF}.ds-band i:nth-child(4){background:#6D80FF}.ds-hero dl{display:flex;gap:32px;border-top:1px solid rgba(255,255,255,.28);padding-top:20px}.ds-hero dt{font-size:.9rem;color:#D6DCFF}.ds-hero dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Glance Panel",
+      "kind": "card",
+      "refersTo": "glance-panel",
+      "description": "Tint panel with three key facts, 24px radius.",
+      "html": "<dl class=\"ds-glance\"><div><dt>Timeline</dt><dd>8 weeks</dd></div><div><dt>Investment</dt><dd>$12,400</dd></div><div><dt>Valid until</dt><dd>30 Nov 2026</dd></div></dl>",
+      "css": ".ds-glance{margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:20px 32px;padding:32px 36px;background:#ECEFFF;border-radius:24px;color:#0E1230;font-family:'Hanken Grotesk',system-ui,sans-serif}.ds-glance div{display:grid;gap:2px}.ds-glance dt{font:500 .92rem/1.3 'Hanken Grotesk',system-ui,sans-serif;color:#565C7A}.ds-glance dd{margin:0;font:600 1.55rem/1.25 'Familjen Grotesk',system-ui,sans-serif;letter-spacing:-.015em;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Gantt Panel",
+      "kind": "custom",
+      "refersTo": "gantt-bar",
+      "description": "Bordered 24px panel; cobalt bars with 8px radius over hairline week gridlines.",
+      "html": "<div class=\"ds-gantt\"><div class=\"ds-gname\">Design</div><div class=\"ds-track\"><i></i><i></i><i></i><i></i><div class=\"ds-bar\">Weeks 2-3</div></div></div>",
+      "css": ".ds-gantt{display:grid;grid-template-columns:120px 1fr;align-items:center;padding:12px 26px;background:#fff;border:1px solid #E1E4F0;border-radius:24px;color:#0E1230;font-family:'Hanken Grotesk',system-ui,sans-serif}.ds-gname{font-weight:600;font-size:.97rem}.ds-track{display:grid;grid-template-columns:repeat(4,1fr);min-height:52px;align-items:center}.ds-track i{grid-row:1;align-self:stretch;border-left:1px solid #E1E4F0}.ds-bar{grid-row:1;grid-column:2/4;z-index:1;background:#2B44FF;color:#fff;border-radius:8px;padding:7px 11px;font:700 .8rem 'Hanken Grotesk',system-ui,sans-serif;margin-inline:2px;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Investment Section",
+      "kind": "custom",
+      "refersTo": "ledger-total",
+      "description": "Navy section: proportional share bar, swatched phase rows, tangerine total as the largest figure.",
+      "html": "<div class=\"ds-inv\"><div class=\"ds-shares\"><i style=\"flex:18\"></i><i style=\"flex:46\"></i><i style=\"flex:24\"></i><i style=\"flex:12\"></i></div><table><tbody><tr><td>Discovery</td><td class=\"n\">$1,800</td></tr><tr><td>Design</td><td class=\"n\">$4,600</td></tr></tbody><tfoot><tr><td>Total</td><td class=\"n\">$6,400</td></tr></tfoot></table></div>",
+      "css": ".ds-inv{background:#0A0F3C;color:#fff;padding:40px 32px;display:grid;gap:24px;font-family:'Hanken Grotesk',system-ui,sans-serif}.ds-shares{display:flex;gap:4px;height:22px}.ds-shares i{border-radius:6px;background:#FF7A1A;min-width:6px}.ds-shares i:nth-child(2){background:#FFB27A}.ds-shares i:nth-child(3){background:#8294FF}.ds-shares i:nth-child(4){background:#D6DCFF}.ds-inv table{width:100%;border-collapse:collapse}.ds-inv td{padding:18px 0;border-bottom:1px solid rgba(255,255,255,.16);font-size:1.1rem}.ds-inv .n{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}.ds-inv tfoot td{border:0;padding-top:32px;vertical-align:bottom;color:#B9C1F2;font-weight:600}.ds-inv tfoot .n{color:#FF7A1A;font:700 3.5rem/1 'Familjen Grotesk',system-ui,sans-serif;letter-spacing:-.04em}"
+    },
+    {
+      "name": "Accept Step",
+      "kind": "custom",
+      "refersTo": "step-numeral",
+      "description": "Step under a 2px ink rule with a large cobalt numeral.",
+      "html": "<div class=\"ds-step\"><b>1</b><p>Review the proposal and ask any questions.</p></div>",
+      "css": ".ds-step{border-top:2px solid #0E1230;padding-top:20px;max-width:240px;color:#0E1230;font-family:'Hanken Grotesk',system-ui,sans-serif}.ds-step b{display:block;margin-bottom:14px;font:700 3rem/1 'Familjen Grotesk',system-ui,sans-serif;letter-spacing:-.04em;color:#2B44FF;font-variant-numeric:tabular-nums}.ds-step p{margin:0;font-size:1.1rem}"
+    },
+    {
+      "name": "Signature Field",
+      "kind": "custom",
+      "refersTo": "signature-field",
+      "description": "Surface field, 1.5px ink border, 16px radius, heading, signature line and date line.",
+      "html": "<div class=\"ds-sig\"><b>Accepted for Acme Dental</b><span></span><small>Name and signature</small><span></span><small>Date</small></div>",
+      "css": ".ds-sig{border:1.5px solid #0E1230;border-radius:16px;padding:20px 24px 10px;background:#fff;color:#0E1230;max-width:340px;font-family:'Hanken Grotesk',system-ui,sans-serif}.ds-sig b{font:600 1.1rem/1.3 'Familjen Grotesk',system-ui,sans-serif}.ds-sig span{display:block;padding-top:54px;border-bottom:1px solid #0E1230}.ds-sig small{display:block;padding:6px 0 12px;font-size:.85rem;color:#565C7A}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Product Page",
+    "overview": "The proposal reads like a premium product site, not a paper document. A sticky navy bar always shows where you are; below it, full-width sections change ground as the client scrolls: a cobalt hero, white and canvas reading sections, tint panels, a deep navy Investment section and a final Accept section. There are no tabs, binding holes, page edges, board covers or foil. Type is big and confident, colour is flat, and every decision moment gets its own ground.\n\nDensity is generous. Each section is one full-width band with a 1120px reading column and clamp(72px, 10vw, 136px) of vertical air, so the structure of the deal is legible at a glance. The two decisive moments, the price and the way to accept, get the strongest treatment: the navy section whose tangerine total is the largest figure on the page, and the Accept section with four big cobalt step numerals and signature fields.\n\nThe system rejects the category default: identical rounded cards on a grey canvas with a single teal accent. Here the ground itself changes between sections, and the hero art is made from the project's own data.",
+    "keyCharacteristics": [
+      "Sticky navy navigation bar with the client name, pill section links (the current one filled white) and a tangerine scroll-progress line.",
+      "Cobalt #2B44FF hero with one tone-on-tone circle (#1B2BC8) bleeding off the right edge, a data-made phase band with legend, and five facts.",
+      "Sections alternate white and canvas (#F5F6FB); tint panels (#ECEFFF) carry glance facts, assumptions and the deal line.",
+      "Navy #0A0F3C Investment section with a proportional share bar and the total in tangerine as the largest figure.",
+      "Two grotesques: Familjen Grotesk for display and figures that matter, Hanken Grotesk for text and tables; figures are tabular.",
+      "No gradients, icons or stock imagery. Print: one section per page, colour to the paper edge."
+    ],
+    "rules": [
+      {
+        "name": "The Tangerine-On-Navy Rule",
+        "body": "Tangerine appears only on navy (the total and share bar), plus the progress line, text selection and focus ring. It never sits on a light ground.",
+        "section": "colors"
+      },
+      {
+        "name": "The One-Accent Rule",
+        "body": "On light grounds cobalt is the only accent. In dark mode --accent becomes periwinkle #8294FF so marks stay legible.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ground-Change Rule",
+        "body": "Hierarchy comes from sections changing ground (cobalt, white, canvas, navy), not from boxes inside a single ground.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Figures Rule",
+        "body": "Every figure column, date, week count, price and Gantt label uses tabular numerals.",
+        "section": "typography"
+      },
+      {
+        "name": "The One-Face-Per-Job Rule",
+        "body": "Display face for names, headings, goals, glance figures and the total; text face for running text, tables and labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tone-On-Tone Rule",
+        "body": "Decoration is one shape in a deeper shade of its own ground. No gradients, no icons, no stock imagery.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do change the ground between sections (cobalt, white, canvas, navy) and keep the nav bar sticky.",
+      "Do keep cobalt as the only accent on light grounds.",
+      "Do keep the total in tangerine on navy as the largest figure of the Investment section.",
+      "Do build the hero band and share bar from the proposal's own phases and amounts.",
+      "Do choose radii by role (panels 24, fields 16 and 14, bars 8, pills 999).",
+      "Do keep labels sentence case with tabular numerals, and `overflow-wrap: anywhere` on client-supplied names.",
+      "Do keep one section per printed page with colour to the paper edge (`@page { margin: 0 }`).",
+      "Do keep user text escaped through Jinja autoescape."
+    ],
+    "donts": [
+      "Don't use tangerine on light grounds (only the progress line, selection and focus ring are exceptions).",
+      "Don't use gradients, icons or stock imagery; decoration is tone on tone.",
+      "Don't bring back paper, tabs, binding holes, page edges, a board cover or foil.",
+      "Don't hide anything with CSS waiting for motion beyond the guarded 1.8s hero hold; the page must be complete without GSAP.",
+      "Don't rely on colour alone for the current section; the filled white pill also changes shape against the others.",
+      "Don't invent a logo, contact block or brand colour: no data fields for them exist."
+    ]
+  }
+}

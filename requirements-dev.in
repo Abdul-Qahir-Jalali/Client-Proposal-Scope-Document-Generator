@@ -1,0 +1,9 @@
+-c requirements.txt
+pytest>=8
+pytest-cov
+ruff
+mypy
+pandas-stubs
+pip-tools
+pip-audit
+sentry-sdk>=2

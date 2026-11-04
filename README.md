@@ -9,13 +9,15 @@ timeline and pricing. Edit every word live, then export to HTML, Word or PDF.
 
 ![A six-section proposal: cover, executive summary, scope of work, timeline, investment, next steps](docs/assets/proposal-tour.gif)
 
-The proposal is one HTML presentation with a section per page. It follows your system light or dark
-theme, works on a phone, and prints one section per page.
+The proposal is one modern HTML page: a sticky navigation bar, a photo cover (chosen automatically from the project type) that draws the project's phases as a
+band, then full-width sections for the summary, scope, timeline, a dark Investment section with the total as the largest
+figure, terms, and a clear Accept section with signature fields. It follows your system light or dark theme, works on a
+phone, animates gently as you scroll (and not at all if you prefer reduced motion), and prints one section per page.
 [`docs/sample-proposal.html`](docs/sample-proposal.html) is a real export. Download it and open it in a browser.
 
 ## Run it
 
-You need Python 3.10 or newer.
+You need Python 3.11 or newer.
 
 ```bash
 python -m venv .venv
@@ -84,17 +86,46 @@ proposal/generator.py    Parsing, phase and price templates, proposal builder
 proposal/render.py       HTML rendering
 proposal/docx_export.py  Word export
 proposal/pdf_export.py   PDF export through headless Chrome or Edge
+proposal/limits.py       Input limits, validation and rate limiting
+proposal/monitoring.py   Logging, error tracking (Sentry, optional) and timing
+proposal/health.py       Self-check: python -m proposal.health
 templates/               The HTML proposal template
 samples/                 Demo inputs
 tests/                   Test suite
 docs/                    README images and a sample export
 ```
 
-Run the tests with:
+## Development
+
+Install the exact pinned versions, then run the same checks that CI runs on every push:
 
 ```bash
-.venv\Scripts\python.exe -m pytest -q
+.venv\Scripts\python.exe -m pip install -r requirements.txt -r requirements-dev.txt
+.venv\Scripts\python.exe -m ruff check .
+.venv\Scripts\python.exe -m ruff format --check .
+.venv\Scripts\python.exe -m mypy
+.venv\Scripts\python.exe -m pytest --cov
 ```
+
+To change or upgrade a package, edit `requirements.in` (or `requirements-dev.in`), then rebuild the pinned files:
+
+```bash
+.venv\Scripts\python.exe -m piptools compile --strip-extras --no-header --annotation-style=line -o requirements.txt requirements.in
+```
+
+## Limits
+
+Text length, the number of list lines, table rows, weeks (104) and amounts (1,000,000,000) are limited, and
+"Generate proposal" and "Create PDF" have a short wait between clicks. All numbers are in `proposal/limits.py`.
+
+## Logging, errors and health
+
+Settings are environment variables (see `.env.example`): `LOG_LEVEL`, `LOG_FORMAT` (`text` or `json`),
+`LOG_FILE` (default `logs/app.log`, rotates at 1 MB) and `SENTRY_DSN` (optional crash reports; needs `sentry-sdk`).
+Logs hold counts and timings only, never client names or prices.
+When something unexpected fails, the user sees an *error id*. Search the log or Sentry for that id.
+
+Health check (exit code 0 = healthy): `python -m proposal.health`. The Streamlit server also answers `/_stcore/health`.
 
 ## Safe by design
 

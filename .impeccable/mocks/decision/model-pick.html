@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Title-Block Drawing Set sketch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{--bond:#FFFFFF;--ink:#111111;--blue:#1F4FD8;--red:#C8102E}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden;background:var(--bond);color:var(--ink)}
+.sheet{position:absolute;inset:24px;border:1.5px solid var(--blue);}
+.lab{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:13px;font-weight:500}
+.head{position:absolute;left:0;right:0;top:0;height:92px;border-bottom:1px solid var(--blue);display:flex;align-items:center;justify-content:space-between;padding:0 48px}
+.head h1{font-family:"Barlow Condensed",sans-serif;font-weight:500;font-size:34px;letter-spacing:.42em;text-transform:uppercase}
+.head .lab{color:var(--ink)}
+.rail{position:absolute;left:0;top:92px;bottom:0;width:230px;border-right:1px solid var(--blue);padding:36px 0 0 36px}
+.rail .lab{color:var(--ink);margin-bottom:26px;opacity:.6}
+.rail ol{list-style:none}
+.rail li{display:flex;align-items:center;gap:14px;font-family:"Barlow Condensed",sans-serif;font-size:21px;letter-spacing:.1em;text-transform:uppercase;height:46px;color:#444}
+.rail li i{width:11px;height:11px;border:1.5px solid var(--ink);display:block}
+.rail li b{font-weight:500;color:var(--blue);width:16px}
+.rail li.on{color:var(--ink);font-weight:600}
+.rail li.on i{background:var(--ink)}
+.read{position:absolute;left:310px;top:150px;width:690px}
+.read .lab{color:var(--blue);margin-bottom:14px}
+.read h2{font-family:"Source Serif 4",serif;font-weight:600;font-size:34px;line-height:1.2;margin-bottom:22px}
+.read p{font-family:"Source Serif 4",serif;font-size:17px;line-height:1.65;max-width:68ch;margin-bottom:26px}
+.notes{list-style:none;border-top:1px solid var(--ink)}
+.notes li{display:flex;gap:18px;padding:14px 0;border-bottom:1px solid #ccc;font-family:"Source Serif 4",serif;font-size:17px;line-height:1.5}
+.notes b{font-family:"Barlow Condensed",sans-serif;color:var(--blue);font-weight:600;font-size:22px;width:26px;line-height:1.25}
+.tb{position:absolute;right:0;bottom:0;width:420px;border-top:1px solid var(--blue);border-left:1px solid var(--blue);display:grid;grid-template-columns:1fr 1fr}
+.c{border-bottom:1px solid var(--blue);border-right:1px solid var(--blue);padding:9px 14px 10px;min-height:62px}
+.c:nth-child(even){border-right:0}
+.c .lab{font-size:11px;color:#555;display:block;margin-bottom:4px}
+.c span:last-child{font-family:"Barlow Condensed",sans-serif;font-size:19px;letter-spacing:.04em;text-transform:uppercase;font-weight:500}
+.w{grid-column:1/3;border-right:0}
+.w span:last-child{font-size:23px}
+.tot{grid-column:1/3;border-right:0;display:flex;justify-content:space-between;align-items:flex-end;padding-top:12px}
+.tot .lab{margin:0}
+.tot span:last-child{color:var(--red);font-size:38px;font-weight:600;letter-spacing:.02em;line-height:1}
+.foot{position:absolute;left:310px;bottom:24px;font-family:"Barlow Condensed",sans-serif;font-size:13px;letter-spacing:.16em;color:#666;text-transform:uppercase}
+</style></head><body>
+<div class="sheet">
+ <div class="head"><h1>Website Redesign Proposal</h1><span class="lab">Drawing set &middot; Sheet 1 of 6</span></div>
+ <nav class="rail"><div class="lab">Contents</div><ol>
+  <li class="on"><i></i><b>1</b>Summary</li><li><i></i><b>2</b>Scope</li><li><i></i><b>3</b>Timeline</li>
+  <li><i></i><b>4</b>Investment</li><li><i></i><b>5</b>Terms</li><li><i></i><b>6</b>Accept</li></ol></nav>
+ <section class="read">
+  <div class="lab">Sheet 1 &mdash; Summary</div>
+  <h2>A faster, clearer website for Bright Dental Clinic.</h2>
+  <p>Allure Digital will redesign the clinic's website over eight weeks so that new patients can find the practice, trust it at a glance, and book an appointment in a few taps. This sheet sets out what we are aiming for; the following sheets cover scope, timing, price and terms.</p>
+  <ol class="notes">
+   <li><b>1.</b>Increase online appointment bookings by 30%</li>
+   <li><b>2.</b>Modernise the clinic's look and build patient trust</li>
+   <li><b>3.</b>Make the site fast and easy to use on phones</li>
+  </ol>
+ </section>
+ <div class="foot">Duration 8 weeks &middot; Notes 1&ndash;3 apply to all sheets</div>
+ <div class="tb">
+  <div class="c w"><span class="lab">Project</span><span>Website Redesign Proposal</span></div>
+  <div class="c"><span class="lab">Client</span><span>Bright Dental Clinic</span></div>
+  <div class="c"><span class="lab">Prepared by</span><span>Allure Digital</span></div>
+  <div class="c"><span class="lab">Date</span><span>4 November 2026</span></div>
+  <div class="c"><span class="lab">Revision</span><span>A</span></div>
+  <div class="c"><span class="lab">Valid until</span><span>4 December 2026</span></div>
+  <div class="c"><span class="lab">Sheet</span><span>1 of 6</span></div>
+  <div class="c tot"><span class="lab">Total</span><span>$6,500 &ndash; $8,000</span></div>
+ </div>
+</div>
+</body></html>

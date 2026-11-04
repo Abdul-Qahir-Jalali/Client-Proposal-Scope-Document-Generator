@@ -1,141 +1,293 @@
 <!doctype html>
-<html lang="en">
+<html lang="en"{% if editable %} class="editing"{% endif %}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ p.title }} for {{ p.client }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* Layout: a stack of page-sized slides on a quiet canvas. One teal accent, used for the timeline and key figures. */
+  /* A modern proposal page. Sticky navigation, full-width sections that change ground: cobalt hero, white, tint, navy price.
+     Cobalt is the one accent on light grounds; tangerine appears only on navy. Nothing is hidden by CSS: the motion script
+     (GSAP, loaded at the end) is an enhancement, so the page reads fully with no script, offline, in print and in the PDF. */
   :root {
-    --bg: #EEF1F3;
+    --cobalt: #2B44FF;
+    --cobalt-deep: #1B2BC8;
+    --navy: #0A0F3C;
+    --tang: #FF7A1A;
+    --canvas: #F5F6FB;
     --surface: #FFFFFF;
-    --ink: #14202B;
-    --muted: #5B6B79;
-    --line: #DCE2E8;
-    --accent: #0B6B63;
-    --accent-ink: #FFFFFF;
-    --accent-soft: #DDF0EE;
-    --cover: #0E2A33;
-    --cover-ink: #F2F7F8;
-    --cover-muted: #9DB4BC;
-    --cover-accent: #4FC3B6;
-    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-    --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+    --tint: #ECEFFF;
+    --ink: #0E1230;
+    --muted: #565C7A;
+    --line: #E1E4F0;
+    --accent: #2B44FF;          /* cobalt as text and marks on light grounds */
+    --hero-soft: #D6DCFF;
+    --display: "Familjen Grotesk", "Segoe UI", system-ui, sans-serif;
+    --body: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+    --wrap: 1120px;
+    --gut: clamp(20px, 5vw, 56px);
+    --nav-h: 60px;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #0A1014; --surface: #121C22; --ink: #E7EEF2; --muted: #93A4B1; --line: #25343D;
-      --accent: #4FC3B6; --accent-ink: #06211E; --accent-soft: #123A37;
-      --cover: #081A20; --cover-ink: #F2F7F8; --cover-muted: #86A0A9;
-      color-scheme: dark;
+      --canvas: #0A0D1F; --surface: #11152B; --tint: #171C3A; --ink: #ECEFFF; --muted: #A2A9C8; --line: #262C4A;
+      --accent: #8294FF; color-scheme: dark;
     }
   }
+  :root[data-theme="dark"] .b-navy { background: #111A5E; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .b-navy { background: #111A5E; } }
   :root[data-theme="dark"] {
-    --bg: #0A1014; --surface: #121C22; --ink: #E7EEF2; --muted: #93A4B1; --line: #25343D;
-    --accent: #4FC3B6; --accent-ink: #06211E; --accent-soft: #123A37;
-    --cover: #081A20; --cover-ink: #F2F7F8; --cover-muted: #86A0A9;
-    color-scheme: dark;
+    --canvas: #0A0D1F; --surface: #11152B; --tint: #171C3A; --ink: #ECEFFF; --muted: #A2A9C8; --line: #262C4A;
+    --accent: #8294FF; color-scheme: dark;
   }
 
   * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--bg); color: var(--ink);
-    font: 16px/1.6 var(--body);
-    padding-left: max(16px, env(safe-area-inset-left, 0px));
-    padding-right: max(16px, env(safe-area-inset-right, 0px));
-    padding-block: 24px 48px;
-  }
-  h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; text-wrap: balance; }
-  h1, h2 { letter-spacing: -0.01em; }
-  h2 { font-size: clamp(1.6rem, 3.2vw, 2.1rem); }
-  h3 { font-size: 1.05rem; }
+  html.editing { scrollbar-gutter: stable both-edges; }   /* in the app preview the scrollbar takes space on the right, so reserve the same on the left: nothing touches one edge only */
+  html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 12px); scrollbar-color: var(--muted) var(--canvas); }
+  body { margin: 0; background: var(--canvas); color: var(--ink); font: 400 17px/1.65 var(--body); font-variant-numeric: lining-nums; }
+  h1, h2, h3 { margin: 0; text-wrap: balance; }
+  h2 { font: 600 clamp(2.4rem, 5.6vw, 4.2rem)/1.03 var(--display); letter-spacing: -0.035em; }
+  h3 { font: 600 1rem/1.35 var(--body); color: var(--muted); }
   p { margin: 0; max-width: 68ch; }
-  ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.55rem; }
-  li { position: relative; padding-left: 1.25rem; max-width: 68ch; }
-  li::before { content: ""; position: absolute; left: 0; top: 0.72em; width: 0.6rem; height: 2px; background: var(--accent); }
-  .label, th, .glance dt { font: 600 0.85rem/1.3 var(--body); color: var(--muted); }
-  ::selection { background: var(--accent); color: var(--accent-ink); }
+  ul, ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.75rem; }
+  li { position: relative; padding-left: 1.6rem; max-width: 68ch; }
+  li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--accent); }
+  ::selection { background: var(--tang); color: var(--navy); }
   main { caret-color: var(--accent); }
-  html { scrollbar-color: var(--muted) var(--bg); }
-  a { text-underline-offset: 0.2em; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  a { color: inherit; text-underline-offset: 0.2em; }
+  :focus-visible { outline: 3px solid var(--tang); outline-offset: 3px; }
 
-  .deck { max-width: 1000px; margin: 0 auto; display: grid; gap: 20px; }
-  .slide { background: var(--surface); border: 1px solid var(--line); padding: clamp(24px, 5vw, 56px); display: grid; gap: 28px; align-content: start; min-width: 0; }
-  .slide > header { display: grid; gap: 8px; }
-  .slide > header p { color: var(--muted); }
+  /* ---------- Navigation: always shows where you are ---------- */
+  .topbar { position: sticky; top: 0; z-index: 30; height: var(--nav-h); background: var(--navy); color: #fff; }
+  .topbar .in { height: 100%; max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gut); display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .brand { font: 600 1.05rem/1 var(--display); letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 32ch; }
+  .links { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+  .links a { flex: none; padding: 9px 14px; border-radius: 999px; text-decoration: none; font: 500 0.92rem/1 var(--body); color: #C9D0FF; }
+  .links a:hover { background: rgb(255 255 255 / 0.1); color: #fff; }
+  .links a.is-active { background: #fff; color: var(--navy); }
+  .progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--tang); transform: scaleX(0); transform-origin: left; }
 
-  /* Cover */
-  .cover { background: var(--cover); color: var(--cover-ink); border-color: var(--cover); min-height: 420px; align-content: space-between; }
-  .cover h1 { font-size: clamp(2.2rem, 6vw, 3.8rem); max-width: 16ch; }
-  .cover .for { font: 500 1.25rem var(--display); color: var(--cover-ink); }
-  .cover .meta { display: flex; flex-wrap: wrap; gap: 8px 40px; font: 400 0.9rem var(--body); color: var(--cover-muted); }
-  .cover .meta b { display: block; color: var(--cover-ink); font-weight: 500; }
-  .cover .rule { width: 72px; height: 4px; background: var(--cover-accent); margin-block: 18px 22px; }
+  /* ---------- Sections ---------- */
+  .block { padding: clamp(72px, 10vw, 136px) 0; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gut); display: grid; gap: clamp(36px, 5vw, 64px); }
+  .wrap > header { display: grid; gap: 14px; }
+  .wrap > header p { color: var(--muted); font-size: 1.15rem; }
+  .b-white { background: var(--surface); }
+  .b-canvas { background: var(--canvas); }
 
-  /* Summary */
-  .lead { font-size: 1.2rem; line-height: 1.65; }
-  /* Plain fact sheet: three facts between two rules, no tiles. */
-  .glance { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px 32px; padding-block: 18px; border-block: 1px solid var(--line); }
-  .glance > div { display: grid; gap: 4px; }
-  .glance dd { margin: 0; font: 600 1.15rem/1.3 var(--body); color: var(--ink); font-variant-numeric: tabular-nums; }
+  /* ---------- Hero ---------- */
+  .hero { position: relative; overflow: hidden; background: var(--cobalt); color: #fff; min-height: min(calc(100vh - var(--nav-h)), 860px); display: grid; align-items: end; padding: clamp(56px, 8vw, 104px) 0 clamp(40px, 5vw, 64px); }
+  .hero::after { content: ""; position: absolute; width: min(70vmin, 760px); aspect-ratio: 1; border-radius: 50%; background: var(--cobalt-deep); right: calc(min(70vmin, 760px) * -0.28); top: calc(min(70vmin, 760px) * -0.22); }
+  .hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+  .hero.has-img { background: #0B0E24; }
+  .hero.has-img::before { content: ""; position: absolute; inset: 0; z-index: 1;   /* a scrim, darkest where the text sits (left) and where the small facts sit (bottom), so white text stays readable on any photo */
+    background: linear-gradient(90deg, rgb(8 10 30 / 0.82) 0%, rgb(8 10 30 / 0.68) 60%, rgb(8 10 30 / 0.45) 100%), linear-gradient(180deg, rgb(8 10 30 / 0.3) 0%, rgb(8 10 30 / 0.5) 50%, rgb(8 10 30 / 0.74) 100%); }
+  .hero.has-img::after { display: none; }
+  .hero.has-img .wrap { text-shadow: 0 1px 3px rgb(0 0 0 / 0.5), 0 2px 24px rgb(0 0 0 / 0.4); }
+  .hero.has-img .title, .hero.has-img .legend { color: #fff; }
+  .hero.has-img .legend { font-weight: 500; }
+  .hero.has-img .facts dt { color: #E6EAFF; font-weight: 600; }
+  .hero.has-img .facts { border-top-color: rgb(255 255 255 / 0.4); }
+  .hero .wrap { position: relative; z-index: 2; gap: clamp(32px, 4vw, 56px); }
+  .hero h1 { font: 700 clamp(2.8rem, 9vw, 8rem)/0.94 var(--display); letter-spacing: -0.045em; overflow-wrap: anywhere; max-width: 14ch; }
+  .hero .title { margin-top: 24px; font: 500 clamp(1.3rem, 2.8vw, 2rem)/1.2 var(--display); letter-spacing: -0.015em; color: var(--hero-soft); overflow-wrap: anywhere; text-wrap: balance; }
+  .band { display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 4px; height: 20px; }
+  .band i { grid-row: 1; border-radius: 6px; background: #fff; }
+  .band i:nth-child(4n+2), .legend li:nth-child(4n+2)::before { background: #C4CCFF; }
+  .band i:nth-child(4n+3), .legend li:nth-child(4n+3)::before { background: #97A6FF; }
+  .band i:nth-child(4n+4), .legend li:nth-child(4n+4)::before { background: #6D80FF; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 14px 0 0; padding: 0; font-size: 0.95rem; color: var(--hero-soft); }
+  .legend li { padding-left: 1.1rem; max-width: none; }
+  .legend li::before { top: 0.4em; width: 0.7rem; height: 0.7rem; border-radius: 3px; background: #fff; }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px 32px; margin: 0; padding-top: 28px; border-top: 1px solid rgb(255 255 255 / 0.28); }
+  .facts div { display: grid; gap: 3px; align-content: start; min-width: 0; }
+  .facts dt { font: 500 0.9rem/1.3 var(--body); color: var(--hero-soft); }
+  .facts dd { margin: 0; font: 600 1.1rem/1.35 var(--body); color: #fff; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 
-  /* Scope */
-  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 32px; }
-  .cols > div { display: grid; gap: 14px; align-content: start; min-width: 0; }
-  .out li::before { background: var(--muted); }
-  .subtle { color: var(--muted); }
+  /* ---------- Opening quote ---------- */
+  .quote { margin: 0; display: grid; gap: 26px; padding-bottom: clamp(36px, 5vw, 64px); border-bottom: 1px solid var(--line); }
+  .quote blockquote { margin: 0; }
+  .quote blockquote::before { content: "\201C"; display: block; height: 0.5em; font: 700 clamp(5.5rem, 10vw, 8rem)/0.9 var(--display); color: var(--accent); }
+  .quote blockquote p { max-width: 24em; font: 600 clamp(1.9rem, 4.2vw, 3.3rem)/1.14 var(--display); letter-spacing: -0.03em; text-wrap: balance; }
+  .quote figcaption { display: grid; gap: 2px; }
+  .quote figcaption b { font: 600 1.2rem/1.3 var(--display); letter-spacing: -0.01em; }
+  .quote figcaption span { color: var(--muted); font-size: 1rem; }
 
-  /* Timeline */
-  .gantt { display: grid; gap: 0; border-top: 1px solid var(--line); padding-top: 6px; overflow-x: auto; }
-  .g-row { display: grid; grid-template-columns: minmax(96px, 190px) minmax(230px, 1fr); border-bottom: 1px solid var(--line); align-items: center; min-width: 0; }
-  .g-name { padding: 10px 12px 10px 0; font-weight: 600; font-size: 0.92rem; }
-  .track { display: grid; grid-template-columns: repeat(var(--n), 1fr); grid-template-rows: 1fr; align-items: center; min-height: 38px; }
-  .track > i { grid-row: 1; align-self: stretch; border-left: 1px solid var(--line); }   /* one cell per week = the gridlines */
-  .bar { grid-row: 1; z-index: 1; background: var(--accent); color: var(--accent-ink); border-radius: 3px; padding: 4px 8px; font: 600 0.78rem var(--body); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-inline: 2px; }
-  .g-head .track { min-height: 0; padding-block: 6px; }
-  .g-head .wk { font: 500 0.8rem var(--body); color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-  .table-wrap { overflow-x: auto; }
-  th { text-align: left; padding: 10px 12px 10px 0; border-bottom: 2px solid var(--ink); }
-  td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  /* ---------- Summary ---------- */
+  .split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 6vw, 88px); align-items: start; }
+  .split > header { display: grid; gap: 28px; align-content: start; }
+  .lead { font-size: 1.3rem; line-height: 1.65; }
+  .goals { display: grid; gap: 0; max-width: none; }
+  .goals li { padding: 22px 0; border-top: 1px solid var(--line); font: 500 clamp(1.45rem, 2.7vw, 2.1rem)/1.2 var(--display); letter-spacing: -0.02em; max-width: 30ch; padding-left: 0; }
+  .goals li:last-child { border-bottom: 1px solid var(--line); }
+  .goals li::before { display: none; }
+  .glance { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px 32px; padding: 32px 36px; background: var(--tint); border-radius: 24px; }
+  .glance > div { display: grid; gap: 2px; }
+  .glance dt { font: 500 0.92rem/1.3 var(--body); color: var(--muted); }
+  .glance dd { margin: 0; font: 600 1.55rem/1.25 var(--display); letter-spacing: -0.015em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* ---------- Scope ---------- */
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(32px, 5vw, 72px); }
+  .cols > div { display: grid; gap: 20px; align-content: start; min-width: 0; }
+  .cols h3 { padding-bottom: 14px; border-bottom: 2px solid var(--ink); color: var(--ink); font: 600 1.5rem/1.2 var(--display); letter-spacing: -0.02em; }
+  .out li::before { background: none; border: 2px solid var(--muted); }
+  .assume { padding: 32px 36px; background: var(--tint); border-radius: 24px; display: grid; gap: 16px; }
+  .assume ul { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px 40px; color: var(--muted); }
+  .assume li::before { background: var(--muted); height: 2px; border-radius: 0; top: 0.85em; width: 0.7rem; }
+  .assume h3 { color: var(--ink); }
+
+  /* ---------- Timeline ---------- */
+  .gantt { display: grid; padding: 22px 26px 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; overflow-x: auto; overflow-y: hidden; }
+  .g-row { display: grid; grid-template-columns: minmax(96px, 200px) minmax(240px, 1fr); border-bottom: 1px solid var(--line); align-items: center; min-width: 0; }
+  .g-row:last-child { border-bottom: 0; }
+  .g-name { padding: 12px 14px 12px 0; font-weight: 600; font-size: 0.97rem; }
+  .track { display: grid; grid-template-columns: repeat(var(--n), 1fr); grid-template-rows: 1fr; align-items: center; min-height: 52px; }
+  .track > i { grid-row: 1; align-self: stretch; border-left: 1px solid var(--line); }
+  .bar { grid-row: 1; z-index: 1; background: var(--cobalt); color: #fff; border-radius: 8px; padding: 7px 11px; font: 700 0.8rem var(--body); font-variant-numeric: tabular-nums;
+         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-inline: 2px; }
+  .g-row:nth-child(4n+3) .bar { background: #1F33D6; }
+  .g-row:nth-child(4n+4) .bar { background: #1626A8; }
+  .g-row:nth-child(4n+1) .bar { background: #0F1C80; }
+  .g-head { border-bottom: 1px solid var(--line); }
+  .g-head .track { min-height: 0; padding-block: 8px; }
+  .g-head .wk { font: 600 0.82rem var(--body); color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+  .g-head .g-name { font: 600 0.88rem var(--body); color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+  .table-wrap { overflow-x: auto; overflow-y: hidden; }
+  .ledger-wrap { overflow: visible; }   /* the price table never scrolls: no stray scrollbar, no clipped amounts */
+  th { text-align: left; padding: 10px 16px 12px 0; border-bottom: 2px solid var(--ink); font: 600 0.88rem var(--body); color: var(--muted); }
+  td { padding: 16px 16px 16px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; white-space: nowrap; }
-  td.when { font-weight: 600; white-space: nowrap; color: var(--accent); font-variant-numeric: tabular-nums; }
-  tfoot td { border-bottom: 0; border-top: 2px solid var(--ink); font: 700 1.2rem var(--display); }
+  td.when { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--accent); }
 
-  /* Closing */
-  .sign { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px; margin-top: 12px; }
-  .sign div { border-top: 1px solid var(--ink); padding-top: 8px; font-size: 0.85rem; color: var(--muted); }
-  .steps { counter-reset: step; }
-  .steps li { padding-left: 2.2rem; }
-  .steps li::before { counter-increment: step; content: counter(step); background: none; top: 0; width: auto; height: auto; font: 700 0.95rem var(--body); color: var(--accent); font-variant-numeric: tabular-nums; }
+  /* ---------- Investment: the one dark, full-width section ---------- */
+  .b-navy { background: var(--navy); color: #fff; }
+  .b-navy h2 { color: #fff; }
+  .b-navy .wrap > header p { color: #B9C1F2; }
+  .ledger th { color: #B9C1F2; border-bottom-color: rgb(255 255 255 / 0.5); }
+  .ledger td { padding-block: 20px; font-size: 1.1rem; border-bottom-color: rgb(255 255 255 / 0.16); }
+  .ledger td.num { font-weight: 600; font-size: 1.2rem; }
+  .ledger tfoot td { border-bottom: 0; padding: 36px 0 0; vertical-align: bottom; }
+  .ledger tfoot td:first-child { font: 600 1.1rem var(--body); color: #B9C1F2; padding-bottom: 12px; }
+  .ledger tfoot td.num { color: var(--tang); font: 700 clamp(2.4rem, 6.6vw, 5rem)/1 var(--display); letter-spacing: -0.04em; }
+  .shares { display: flex; gap: 4px; height: 22px; }
+  .shares i { border-radius: 6px; background: #fff; min-width: 6px; }
+  .shares i:nth-child(4n+2), .ledger tbody tr:nth-child(4n+2) td:first-child::before { background: #C4CCFF; }
+  .shares i:nth-child(4n+3), .ledger tbody tr:nth-child(4n+3) td:first-child::before { background: #97A6FF; }
+  .shares i:nth-child(4n+4), .ledger tbody tr:nth-child(4n+4) td:first-child::before { background: #6D80FF; }
+  .ledger tbody td:first-child { position: relative; padding-left: calc(0.8rem + 14px); }
+  .ledger tbody td:first-child::before { content: ""; position: absolute; left: 0; top: calc(20px + 0.3em); width: 0.8rem; height: 0.8rem; border-radius: 3px; background: #fff; }
+  .none { font: 500 clamp(1.6rem, 3vw, 2.2rem)/1.3 var(--display); max-width: 28ch; letter-spacing: -0.02em; color: #fff; }
 
-  /* Editing */
-  .toolbar { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; max-width: 1000px; margin: 0 auto 16px; padding: 10px 14px; background: var(--ink); color: var(--bg); font: 500 0.82rem var(--body); }
+  /* ---------- Terms and Accept ---------- */
+  .twin { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 72px); align-items: start; }
+  .twin > div { display: grid; gap: 14px; min-width: 0; }
+  .twin h3 { color: var(--ink); font: 600 1.5rem/1.2 var(--display); letter-spacing: -0.02em; }
+  .rows { display: grid; gap: 0; }
+  .rows li { padding: 16px 0; border-top: 1px solid var(--line); max-width: none; font-size: 1.08rem; padding-left: 0; }
+  .rows li::before { display: none; }
+  .rows li:last-child { border-bottom: 1px solid var(--line); }
+  .steps { counter-reset: step; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 28px; }
+  .steps li { padding: 20px 0 0; border-top: 2px solid var(--ink); font-size: 1.1rem; max-width: none; }
+  .steps li::before { counter-increment: step; content: counter(step); position: static; display: block; width: auto; height: auto; margin-bottom: 14px; background: none; border-radius: 0;
+         font: 700 3rem/1 var(--display); letter-spacing: -0.04em; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .deal { max-width: none; padding: 30px 36px; background: var(--tint); border-radius: 24px; font: 600 clamp(1.3rem, 2.6vw, 1.9rem)/1.3 var(--display); letter-spacing: -0.015em; font-variant-numeric: tabular-nums; }
+  .sign { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; }
+  .sig { background: var(--surface); border: 1.5px solid var(--ink); border-radius: 16px; padding: 20px 24px 10px; display: grid; gap: 0; min-width: 0; }
+  .sig b { font: 600 1.1rem/1.3 var(--display); overflow-wrap: anywhere; }
+  .sig span { display: block; padding-top: 54px; border-bottom: 1px solid var(--ink); }
+  .sig small { display: block; padding: 6px 0 12px; font-size: 0.85rem; color: var(--muted); }
+
+  /* ---------- Editing toolbar ---------- */
+  .toolbar { position: sticky; top: 0; z-index: 40; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px var(--gut); background: var(--ink); color: var(--canvas); font: 500 0.85rem var(--body); }
   .toolbar span { flex: 1 1 220px; }
-  .toolbar button { font: 600 0.82rem var(--body); padding: 7px 14px; border: 1px solid var(--bg); background: transparent; color: var(--bg); cursor: pointer; }
-  .toolbar button.primary { background: var(--bg); color: var(--ink); }
-  .toolbar button:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-  .toolbar button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  [contenteditable="true"] :is(p, li, h1, h2, h3, td, th, dd, .for, .meta b):hover { outline: 1px dashed var(--accent); outline-offset: 3px; cursor: text; }
-  [contenteditable="true"] :is(p, li, h1, h2, h3, td, th, dd, .for, .meta b):focus { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .toolbar button { font: 600 0.85rem var(--body); padding: 8px 14px; border: 1px solid var(--canvas); border-radius: 999px; background: transparent; color: var(--canvas); cursor: pointer; }
+  .toolbar button.primary { background: var(--canvas); color: var(--ink); }
+  .toolbar button:hover { background: var(--tang); border-color: var(--tang); color: var(--navy); }
+  .is-editing .topbar { position: static; }
+  [contenteditable="true"] :is(p, li, h1, h2, h3, td, th, dd, dt, .title, b, small):hover { outline: 1px dashed var(--accent); outline-offset: 3px; cursor: text; }
+  [contenteditable="true"] :is(p, li, h1, h2, h3, td, th, dd, dt, .title, b, small):focus { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .m-wait .hero h1, .m-wait .hero .title, .m-wait .hero .band, .m-wait .hero .legend li, .m-wait .hero .facts > div { opacity: 0; }
 
-  @media (max-width: 640px) { .cover { min-height: 340px; } .g-row { grid-template-columns: 84px minmax(180px, 1fr); } .g-name { font-size: 0.85rem; padding-right: 6px; } .bar { padding: 4px 3px; font-size: 0.7rem; margin-inline: 1px; } }
-  @media print {
-    :root, :root[data-theme] { --bg: #fff; --surface: #fff; --ink: #14202B; --muted: #5B6B79; --line: #DCE2E8; --accent: #0B6B63; --accent-ink: #fff; --accent-soft: #DDF0EE; --cover: #0E2A33; }
-    body { background: #fff; padding: 0; font-size: 12pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .deck { gap: 0; max-width: none; }
-    .slide { border: 0; break-after: page; padding: 28px 8px; }
-    .cover { min-height: 90vh; }
-    .no-export { display: none !important; }
+  /* ---------- Narrow screens ---------- */
+  @media (max-width: 860px) {
+    .split { grid-template-columns: 1fr; }
   }
-  @media (prefers-reduced-motion: no-preference) { .toolbar button { transition: background 0.15s; } }
+  @media (max-width: 720px) {
+    :root { --nav-h: 54px; }
+    body { font-size: 16px; }
+    .brand { display: none; }
+    .links { -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); width: 100%; }
+    .block { padding: 56px 0; }
+    .hero { min-height: min(calc(100vh - var(--nav-h)), 720px); }
+    .hero.has-img::before { background: linear-gradient(180deg, rgb(8 10 30 / 0.72) 0%, rgb(8 10 30 / 0.78) 50%, rgb(8 10 30 / 0.88) 100%); }
+    .glance, .assume, .deal { padding: 24px; border-radius: 20px; }
+    .glance dd { white-space: normal; }
+    .gantt { padding: 16px 16px 4px; border-radius: 20px; }
+    .g-row { grid-template-columns: 84px minmax(180px, 1fr); }
+    .g-name { font-size: 0.86rem; padding-right: 6px; }
+    .g-head .wk:not(:nth-child(4n+1)) { visibility: hidden; }
+    .bar { font-size: 0; padding: 7px 0; margin-inline: 1px; }
+    .ms thead { display: none; }
+    .ms tr { display: block; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .ms td { display: block; padding: 0; border: 0; }
+    .ms td.when { margin-bottom: 2px; }
+    .ms td:nth-child(2) { font-size: 1.08rem; }
+    .ledger td { padding-block: 14px; font-size: 1.02rem; }
+    .shares { height: 16px; }
+    .ledger td.num { font-size: 1.02rem; }
+    .ledger td:first-child { padding-right: 10px; }
+    .ledger tfoot td { padding-top: 24px; }
+    .ledger tfoot td.num { font-size: clamp(1.7rem, 8.2vw, 2.6rem); white-space: nowrap; }
+    .steps { grid-template-columns: 1fr 1fr; gap: 24px 20px; }
+  }
+  @media (max-width: 420px) { .steps { grid-template-columns: 1fr; } }
+
+  /* ---------- Print: one section per page, colour to the paper edge; motion never hides anything ---------- */
+  @media print {
+    @page { margin: 0; }
+    html { scroll-behavior: auto; }
+    :root, :root[data-theme] { --canvas: #fff; --surface: #fff; --tint: #ECEFFF; --ink: #0E1230; --muted: #565C7A; --line: #E1E4F0; --accent: #2B44FF; --nav-h: 0px; }
+    body { background: #fff; font-size: 11.5pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .topbar, .no-export { display: none !important; }
+    .block { min-height: 100vh; break-after: page; padding: 18mm 0; display: grid; align-content: center; }
+    .hero { min-height: 100vh; }
+    .wrap { padding: 0 20mm; gap: 9mm; }
+    .split { gap: 10mm; }
+    #sec-summary .wrap { gap: 7mm; }
+    #sec-summary .goals li { padding: 11px 0; font-size: 1.25rem; letter-spacing: -0.01em; }
+    #sec-summary .lead { font-size: 1.05rem; }
+    .quote { gap: 8px; padding-bottom: 6mm; }
+    .quote blockquote::before { font-size: 4rem; height: 0.4em; }
+    .quote blockquote p { font-size: 1.45rem; letter-spacing: -0.01em; }
+    .quote figcaption b { font-size: 1rem; }
+    .glance { grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 20px 24px; gap: 12px 16px; }
+    .shares { height: 14px; }
+    .glance dd { font-size: 1.15rem; }
+    .facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    table, .gantt, .sig, .glance, .assume { break-inside: avoid; }
+    .table-wrap, .gantt { overflow: visible; }
+    .ledger tfoot td.num { font-size: 2.6rem; white-space: normal; }
+    [data-m] { opacity: 1 !important; visibility: visible !important; transform: none !important; clip-path: none !important; }
+    .m-wait .hero h1, .m-wait .hero .title, .m-wait .hero .band, .m-wait .hero .legend li, .m-wait .hero .facts > div { opacity: 1 !important; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 </style>
+<script>
+/* Holds the hero back for an instant so it does not flash before it opens. Added only when motion is allowed,
+   and always released (by the motion script, or after 1.8 s), so the page can never stay hidden. */
+if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches && !window.matchMedia('print').matches) {
+  document.documentElement.classList.add('m-wait');
+  setTimeout(function () { document.documentElement.classList.remove('m-wait'); }, 1800);
+}
+</script>
 </head>
-<body>
+<body{% if editable %} class="is-editing"{% endif %}>
+{% set secs = [('summary', 'Summary'), ('scope', 'Scope'), ('timeline', 'Timeline'), ('investment', 'Investment')] %}
+{% if p.payment_terms or p.notes %}{% set secs = secs + [('terms', 'Terms')] %}{% endif %}
+{% set secs = secs + [('accept', 'Accept')] %}
 {% if editable %}
 <div class="toolbar no-export" id="toolbar">
   <span>Click any text to edit it. Edits here are not saved back to the app until you download.</span>
@@ -144,118 +296,224 @@
   <button type="button" id="btn-reset">Reset</button>
 </div>
 {% endif %}
-<main class="deck" id="doc"{% if editable %} contenteditable="true" spellcheck="true"{% endif %}>
+<header class="topbar" contenteditable="false">
+  <div class="in">
+    <span class="brand">{{ p.client }}</span>
+    <nav class="links" aria-label="Sections">
+      {%- for key, name in secs %}<a href="#sec-{{ key }}">{{ name }}</a>{% endfor -%}
+    </nav>
+  </div>
+  <div class="progress" aria-hidden="true"></div>
+</header>
+<main id="doc"{% if editable %} contenteditable="true" spellcheck="true"{% endif %}>
 
-  <section class="slide cover">
-    <div>
-      <div class="rule"></div>
-      <h1>{{ p.title }}</h1>
-      <p class="for">Prepared for {{ p.client }}</p>
-    </div>
-    <div class="meta">
-      <div>Prepared by<b>{{ p.prepared_by }}</b></div>
-      <div>Date<b>{{ p.prepared_on }}</b></div>
-      <div>Valid until<b>{{ p.valid_until }}</b></div>
-    </div>
-  </section>
-
-  <section class="slide">
-    <header><h2>Executive summary</h2></header>
-    <p class="lead">{{ p.summary }}</p>
-    <dl class="glance">
-      <div><dt>Timeline</dt><dd>{{ weeks }} week{{ '' if weeks == 1 else 's' }}</dd></div>
-      <div><dt>Deliverables</dt><dd>{{ p.deliverables | length }}</dd></div>
-      <div><dt>Investment</dt><dd>{{ price_total }}</dd></div>
-    </dl>
-    {% if p.goals %}
-    <div>
-      <h3>Project goals</h3>
-      <ul style="margin-top:12px">{% for g in p.goals %}<li>{{ g }}</li>{% endfor %}</ul>
-    </div>
-    {% endif %}
-  </section>
-
-  <section class="slide">
-    <header><h2>Scope of work</h2><p>What is included, and what is not.</p></header>
-    <div class="cols">
+  <section class="block hero{% if hero_image %} has-img{% endif %}" id="top" aria-label="Cover">
+    {% if hero_image %}<img class="hero-img" src="{{ hero_image }}" alt="" aria-hidden="true">{% endif %}
+    <div class="wrap">
       <div>
-        <h3>Included</h3>
-        <ul>{% for i in p.scope_in %}<li>{{ i }}</li>{% endfor %}</ul>
+        <h1>{{ p.client }}</h1>
+        <p class="title">{{ p.title }}</p>
       </div>
-      <div class="out">
-        <h3>Not included</h3>
-        <ul>{% for i in p.scope_out %}<li>{{ i }}</li>{% endfor %}</ul>
+      {% if gantt.rows %}
+      <div aria-hidden="true">
+        <div class="band" style="--n: {{ gantt.n }}">{% for m in gantt.rows %}<i style="grid-column: {{ m.col_start }} / {{ m.col_end }}"></i>{% endfor %}</div>
       </div>
-    </div>
-    {% if p.assumptions %}
-    <div>
-      <h3>Assumptions</h3>
-      <ul style="margin-top:12px" class="subtle">{% for i in p.assumptions %}<li>{{ i }}</li>{% endfor %}</ul>
-    </div>
-    {% endif %}
-  </section>
-
-  <section class="slide">
-    <header><h2>Timeline and milestones</h2><p>{{ weeks }} week{{ '' if weeks == 1 else 's' }} across {{ p.milestones | length }} phase{{ '' if p.milestones | length == 1 else 's' }}.</p></header>
-    <div class="gantt" role="img" aria-label="Project timeline by week" style="--n: {{ gantt.n }}">
-      <div class="g-row g-head">
-        <div class="g-name label">Week</div>
-        <div class="track">{% for w in gantt.labels %}<div class="wk">{{ w.week if w.show else '' }}</div>{% endfor %}</div>
-      </div>
-      {% for m in gantt.rows %}
-      <div class="g-row">
-        <div class="g-name">{{ m.phase }}</div>
-        <div class="track">{% for w in gantt.labels %}<i style="grid-column: {{ w.week }}"></i>{% endfor %}<div class="bar" style="grid-column: {{ m.col_start }} / {{ m.col_end }}" title="{{ m.label }}">{{ m.short }}</div></div>
-      </div>
-      {% endfor %}
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>When</th><th>Phase</th><th>What happens</th></tr></thead>
-        <tbody>
-          {% for m in gantt.rows %}
-          <tr><td class="when">{{ m.label }}</td><td><b>{{ m.phase }}</b></td><td>{{ m.description }}</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <ul class="legend">{% for m in gantt.rows[:8] %}<li>{{ m.phase }}, {{ m.label | lower }}</li>{% endfor %}</ul>
+      {% endif %}
+      <dl class="facts">
+        <div><dt>Prepared by</dt><dd>{{ p.prepared_by }}</dd></div>
+        <div><dt>Date</dt><dd>{{ p.prepared_on }}</dd></div>
+        <div><dt>Valid until</dt><dd>{{ p.valid_until }}</dd></div>
+        <div><dt>Timeline</dt><dd>{{ weeks }} week{{ '' if weeks == 1 else 's' }}</dd></div>
+        <div><dt>Investment</dt><dd>{{ price_total }}</dd></div>
+      </dl>
     </div>
   </section>
 
-  <section class="slide">
-    <header><h2>Investment</h2>{% if has_price %}<p>Estimated total: {{ price_total }}.</p>{% endif %}</header>
-    {% if has_price %}
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Phase</th><th class="num">{{ 'Estimate' if range_prices else 'Amount' }}</th></tr></thead>
-        <tbody>
-          {% for i in p.price_items %}
-          <tr><td>{{ i.item }}</td><td class="num">{{ i | price_range(p.currency) }}</td></tr>
-          {% endfor %}
-        </tbody>
-        <tfoot><tr><td>Total</td><td class="num">{{ price_total }}</td></tr></tfoot>
-      </table>
+  <section class="block b-white" id="sec-summary">
+    <div class="wrap">
+      {% if p.quote %}
+      <figure class="quote">
+        <blockquote><p>{{ p.quote.text }}</p></blockquote>
+        <figcaption><b>{{ p.quote.author }}</b><span>{{ p.quote.role }}{% if p.quote.source %}, {{ p.quote.source }}{% endif %}</span></figcaption>
+      </figure>
+      {% endif %}
+      <div class="split">
+        <header>
+          <h2>Executive summary</h2>
+          <p class="lead">{{ p.summary }}</p>
+        </header>
+        {% if p.goals %}
+        <div>
+          <h3 style="margin-bottom:10px">What we will achieve</h3>
+          <ul class="goals">{% for g in p.goals %}<li>{{ g }}</li>{% endfor %}</ul>
+        </div>
+        {% endif %}
+      </div>
+      <dl class="glance">
+        <div><dt>Timeline</dt><dd>{{ weeks }} week{{ '' if weeks == 1 else 's' }}</dd></div>
+        <div><dt>Investment</dt><dd>{{ price_total }}</dd></div>
+        <div><dt>Valid until</dt><dd>{{ p.valid_until }}</dd></div>
+      </dl>
     </div>
-    {% if p.payment_terms %}
-    <div><h3>Payment terms</h3><ul style="margin-top:12px">{% for t in p.payment_terms %}<li>{{ t }}</li>{% endfor %}</ul></div>
-    {% endif %}
-    {% else %}
-    <p>Pricing will be confirmed once the scope is agreed.</p>
-    {% endif %}
   </section>
 
-  <section class="slide">
-    <header><h2>Next steps</h2><p>How we get started.</p></header>
-    {% if p.notes %}
-    <div><h3>Special considerations</h3><ul style="margin-top:12px">{% for n in p.notes %}<li>{{ n }}</li>{% endfor %}</ul></div>
-    {% endif %}
-    <ul class="steps">{% for s in p.next_steps %}<li>{{ s }}</li>{% endfor %}</ul>
-    <div class="sign">
-      <div>Accepted for {{ p.client }}<br>Name, signature and date</div>
-      <div>For {{ p.prepared_by }}<br>Name, signature and date</div>
+  <section class="block b-canvas" id="sec-scope">
+    <div class="wrap">
+      <header><h2>Scope of work</h2><p>What is included, and what is not.</p></header>
+      <div class="cols">
+        <div>
+          <h3>Included</h3>
+          <ul>{% for i in p.scope_in %}<li>{{ i }}</li>{% endfor %}</ul>
+        </div>
+        <div class="out">
+          <h3>Not included</h3>
+          <ul>{% for i in p.scope_out %}<li>{{ i }}</li>{% endfor %}</ul>
+        </div>
+      </div>
+      {% if p.assumptions %}
+      <div class="assume">
+        <h3>Assumptions</h3>
+        <ul>{% for i in p.assumptions %}<li>{{ i }}</li>{% endfor %}</ul>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="block b-white" id="sec-timeline">
+    <div class="wrap">
+      <header><h2>Timeline and milestones</h2><p>{{ weeks }} week{{ '' if weeks == 1 else 's' }} across {{ p.milestones | length }} phase{{ '' if p.milestones | length == 1 else 's' }}.</p></header>
+      <div class="gantt" role="img" aria-label="Project timeline by week: {{ weeks }} weeks across {{ p.milestones | length }} phases" style="--n: {{ gantt.n }}">
+        <div class="g-row g-head">
+          <div class="g-name">Week</div>
+          <div class="track">{% for w in gantt.labels %}<div class="wk">{{ w.week if w.show else '' }}</div>{% endfor %}</div>
+        </div>
+        {% for m in gantt.rows %}
+        <div class="g-row">
+          <div class="g-name">{{ m.phase }}</div>
+          <div class="track">{% for w in gantt.labels %}<i style="grid-column: {{ w.week }}"></i>{% endfor %}<div class="bar" style="grid-column: {{ m.col_start }} / {{ m.col_end }}" title="{{ m.label }}">{{ m.short }}</div></div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="table-wrap">
+        <table class="ms">
+          <thead><tr><th>When</th><th>Phase</th><th>What happens</th></tr></thead>
+          <tbody>
+            {% for m in gantt.rows %}
+            <tr><td class="when">{{ m.label }}</td><td><b>{{ m.phase }}</b></td><td>{{ m.description }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="block b-navy" id="sec-investment">
+    <div class="wrap">
+      <header><h2>Investment</h2>{% if has_price %}<p>Priced by phase, in {{ p.currency }}.</p>{% endif %}</header>
+      {% if has_price %}
+      <div class="shares" aria-hidden="true">{% for i in p.price_items %}<i style="flex: {{ [i.high, 1] | max }}"></i>{% endfor %}</div>
+      <div class="table-wrap ledger-wrap">
+        <table class="ledger">
+          <thead><tr><th>Phase</th><th class="num">{{ 'Estimate' if range_prices else 'Amount' }}</th></tr></thead>
+          <tbody>
+            {% for i in p.price_items %}
+            <tr><td>{{ i.item }}</td><td class="num">{{ i | price_range(p.currency) }}</td></tr>
+            {% endfor %}
+          </tbody>
+          <tfoot><tr><td>Total</td><td class="num">{{ price_total }}</td></tr></tfoot>
+        </table>
+      </div>
+      {% else %}
+      <p class="none">Pricing will be confirmed once the scope is agreed.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if p.payment_terms or p.notes %}
+  <section class="block b-canvas" id="sec-terms">
+    <div class="wrap">
+      <header><h2>Terms</h2><p>How payment works, and what to keep in mind.</p></header>
+      <div class="twin">
+        {% if p.payment_terms %}
+        <div><h3>Payment terms</h3><ul class="rows">{% for t in p.payment_terms %}<li>{{ t }}</li>{% endfor %}</ul></div>
+        {% endif %}
+        {% if p.notes %}
+        <div><h3>Special considerations</h3><ul class="rows">{% for n in p.notes %}<li>{{ n }}</li>{% endfor %}</ul></div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="block b-white" id="sec-accept">
+    <div class="wrap">
+      <header><h2>Accept and next steps</h2><p>How we get started, and where to sign.</p></header>
+      <ol class="steps">{% for s in p.next_steps %}<li>{{ s }}</li>{% endfor %}</ol>
+      <p class="deal">{{ p.client }}: {{ price_total }} over {{ weeks }} week{{ '' if weeks == 1 else 's' }}. Valid until {{ p.valid_until }}.</p>
+      <div class="sign">
+        <div class="sig"><b>Accepted for {{ p.client }}</b><span></span><small>Name and signature</small><span style="padding-top:34px"></span><small>Date</small></div>
+        <div class="sig"><b>For {{ p.prepared_by }}</b><span></span><small>Name and signature</small><span style="padding-top:34px"></span><small>Date</small></div>
+      </div>
     </div>
   </section>
 
 </main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous" defer></script>
+{% raw %}
+<script>
+/* Motion: "Premium" personality (decelerating, no overshoot). One entrance pattern: rise a little and fade in.
+   It runs only with GSAP loaded, with no reduced-motion preference, and never in print. Without it the page is static. */
+window.addEventListener('load', function () {
+  var release = function () { document.documentElement.classList.remove('m-wait'); };
+  if (!window.gsap || !window.ScrollTrigger) { release(); return; }
+  gsap.registerPlugin(ScrollTrigger);
+  var mm = gsap.matchMedia();
+  mm.add('(prefers-reduced-motion: no-preference)', function () {
+    release();   // from() reads the current state as its end, so the hold must be lifted before the tweens are made
+    if (window.matchMedia('print').matches) { return; }
+    var mark = function (sel) { document.querySelectorAll(sel).forEach(function (e) { e.setAttribute('data-m', ''); }); };
+    ['.shares i', '.hero-img', '.hero h1', '.hero .title', '.hero .band', '.hero .band i', '.hero .legend li', '.hero .facts > div', '.bar', '.ledger tfoot td'].forEach(mark);
+    var ease = 'power2.out';
+
+    // 1. The hero opens: name, title, then the project's phases are drawn across, then the facts.
+    gsap.from('.hero-img', { scale: 1.07, duration: 1.8, ease: ease });
+    gsap.timeline({ defaults: { ease: ease } })
+      .from('.hero h1', { autoAlpha: 0, y: 30, duration: 0.7 })
+      .from('.hero .title', { autoAlpha: 0, y: 14, duration: 0.5 }, '-=0.4')
+      .from('.hero .band i', { clipPath: 'inset(0 100% 0 0)', duration: 0.6, stagger: 0.1 }, '-=0.2')
+      .from('.hero .legend li', { autoAlpha: 0, y: 8, duration: 0.4, stagger: 0.05 }, '-=0.5')
+      .from('.hero .facts > div', { autoAlpha: 0, y: 10, duration: 0.4, stagger: 0.06 }, '-=0.3');
+
+    // 2. Time becomes visible: the timeline bars are drawn along the weeks.
+    gsap.from('.bar', { clipPath: 'inset(0 100% 0 0)', duration: 0.6, stagger: 0.08, ease: ease, scrollTrigger: { trigger: '.gantt', start: 'top 80%', once: true } });
+
+    // 3. The price: each phase's share is drawn first, then the total arrives last.
+    gsap.from('.shares i', { clipPath: 'inset(0 100% 0 0)', duration: 0.6, stagger: 0.1, ease: ease, scrollTrigger: { trigger: '.shares', start: 'top 85%', once: true } });
+    gsap.from('.ledger tfoot td', { autoAlpha: 0, y: 14, duration: 0.6, stagger: 0.1, ease: ease, scrollTrigger: { trigger: '.ledger tfoot', start: 'top 92%', once: true } });
+
+    // 4. The bar at the top always shows progress and the current section.
+    gsap.to('.progress', { scaleX: 1, ease: 'none', scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 0.3 } });
+    document.querySelectorAll('.links a').forEach(function (a) {
+      var sec = document.querySelector(a.getAttribute('href'));
+      if (!sec) { return; }
+      ScrollTrigger.create({ trigger: sec, start: 'top 45%', end: 'bottom 45%', onToggle: function (self) {
+        a.classList.toggle('is-active', self.isActive);
+        if (self.isActive && a.parentNode.scrollWidth > a.parentNode.clientWidth) { a.parentNode.scrollTo({ left: a.offsetLeft - 20, behavior: 'smooth' }); }
+      } });
+    });
+  });
+  release();
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(function () { ScrollTrigger.refresh(); }); }
+  // Printing or saving a PDF always shows the finished page.
+  window.addEventListener('beforeprint', function () {
+    ScrollTrigger.getAll().forEach(function (t) { t.kill(); });
+    gsap.set('[data-m]', { clearProps: 'opacity,visibility,transform,translate,scale,transformOrigin,clipPath' });   // never 'all': real inline styles (grid-column) must stay
+  });
+});
+</script>
+{% endraw %}
 {% if editable %}
 {% raw %}
 <script>
@@ -267,6 +525,15 @@
     clone.querySelectorAll('[contenteditable]').forEach(function (e) {
       e.removeAttribute('contenteditable'); e.removeAttribute('spellcheck');
     });
+    clone.querySelectorAll('[data-m]').forEach(function (e) {
+      e.removeAttribute('data-m');   // undo only what the motion script set; keep real inline styles such as grid-column
+      ['opacity', 'visibility', 'transform', 'translate', 'scale', 'transform-origin', 'clip-path', 'will-change'].forEach(function (k) { e.style.removeProperty(k); });
+      if (!e.getAttribute('style')) { e.removeAttribute('style'); }
+    });
+    clone.querySelectorAll('.links a.is-active').forEach(function (e) { e.classList.remove('is-active'); });
+    var pr = clone.querySelector('.progress'); if (pr) { pr.removeAttribute('style'); }
+    clone.classList.remove('m-wait');
+    clone.querySelector('body').classList.remove('is-editing');
     return '<!doctype html>\n' + clone.outerHTML;
   }
   document.getElementById('btn-download').addEventListener('click', function () {

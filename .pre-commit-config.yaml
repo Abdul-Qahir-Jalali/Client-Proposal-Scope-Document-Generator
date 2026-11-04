@@ -1,0 +1,26 @@
+# Runs the quick checks before every commit.   Install once:  pip install pre-commit && pre-commit install
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.3
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: [--maxkb=1500]
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+        exclude: ^(docs/|templates/)
+      - id: trailing-whitespace
+        exclude: ^(docs/|templates/)
+  - repo: local
+    hooks:
+      - id: pytest-fast
+        name: tests
+        entry: python -m pytest -q -x
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

@@ -6,7 +6,8 @@ from pathlib import Path
 import pytest
 from docx import Document
 
-from proposal import docx_export, generator as gen, pdf_export, render
+from proposal import docx_export, pdf_export, render
+from proposal import generator as gen
 
 SAMPLES = gen.load_samples()
 TODAY = date(2026, 1, 5)
@@ -16,21 +17,31 @@ def test_three_samples_available():
     assert len(SAMPLES) == 3
 
 
-@pytest.mark.parametrize("text,expected", [
-    ("$4,000", (4000, 4000, "$")),
-    ("$3,000 - $5,000", (3000, 5000, "$")),
-    ("around $9k", (9000, 9000, "$")),
-    ("£2.5k to £3.5k", (2500, 3500, "£")),
-    ("1500 EUR", (1500, 1500, "€")),
-    ("TBD", (0, 0, "$")),
-])
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("$4,000", (4000, 4000, "$")),
+        ("$3,000 - $5,000", (3000, 5000, "$")),
+        ("around $9k", (9000, 9000, "$")),
+        ("£2.5k to £3.5k", (2500, 3500, "£")),
+        ("1500 EUR", (1500, 1500, "€")),
+        ("TBD", (0, 0, "$")),
+    ],
+)
 def test_parse_money(text, expected):
     assert gen.parse_money(text) == expected
 
 
-@pytest.mark.parametrize("text,weeks", [
-    ("8 weeks", 8), ("3 months", 13), ("30 days", 5), ("soon", 6), ("1 week", 1),
-])
+@pytest.mark.parametrize(
+    "text,weeks",
+    [
+        ("8 weeks", 8),
+        ("3 months", 13),
+        ("30 days", 5),
+        ("soon", 6),
+        ("1 week", 1),
+    ],
+)
 def test_parse_weeks(text, weeks):
     assert gen.parse_weeks(text) == weeks
 
@@ -56,7 +67,7 @@ def test_milestones_cover_every_week_without_gaps(weeks):
         milestones, weights = gen.build_milestones(kind, weeks)
         assert milestones[0]["start"] == 1
         assert milestones[-1]["end"] == weeks
-        for a, b in zip(milestones, milestones[1:]):
+        for a, b in zip(milestones, milestones[1:], strict=False):
             assert b["start"] == a["end"] + 1
         assert len(weights) == len(milestones)
 
@@ -74,10 +85,16 @@ def test_no_price_gives_no_price_items():
     assert gen.price_text(p) == "To be confirmed"
 
 
-@pytest.mark.parametrize("project_type,kind", [
-    ("Website Redesign", "web"), ("Mobile App Development", "app"),
-    ("Marketing Campaign", "marketing"), ("Brand identity", "brand"), ("Consulting", "general"),
-])
+@pytest.mark.parametrize(
+    "project_type,kind",
+    [
+        ("Website Redesign", "web"),
+        ("Mobile App Development", "app"),
+        ("Marketing Campaign", "marketing"),
+        ("Brand identity", "brand"),
+        ("Consulting", "general"),
+    ],
+)
 def test_project_kind(project_type, kind):
     assert gen.project_kind(project_type) == kind
 
@@ -85,7 +102,14 @@ def test_project_kind(project_type, kind):
 def test_html_contains_all_sections():
     p = gen.build_proposal(SAMPLES[next(iter(SAMPLES))], TODAY)
     html = render.render_html(p)
-    for text in ("Executive summary", "Scope of work", "Timeline", "Investment", "Next steps", "Bright Dental Clinic"):
+    for text in (
+        "Executive summary",
+        "Scope of work",
+        "Timeline",
+        "Investment",
+        "Accept and next steps",
+        "Bright Dental Clinic",
+    ):
         assert text in html
     assert 'contenteditable="true" spellcheck' not in html and 'id="toolbar"' not in html
 
@@ -104,26 +128,33 @@ def test_user_text_is_escaped():
 
 def test_summary_reads_naturally():
     p = gen.build_proposal(SAMPLES[next(iter(SAMPLES))], TODAY)
-    assert "a website redesign for Bright Dental Clinic over 8 weeks" in p["summary"]
-    assert "$6,500 – $8,000" in p["summary"]
+    assert "will deliver the website redesign for Bright Dental Clinic in 8 weeks." in p["summary"]
+    assert "4 phases, from Discovery & Planning to Review & Launch, and covers 5 deliverables." in p["summary"]
+    assert "$" not in p["summary"]  # the price is shown in its own place, not repeated here
 
 
-@pytest.mark.parametrize("text,expected", [
-    ("$6,500 (50% upfront)", (6500, 6500)),
-    ("$4,000 per month for 3 months", (4000, 4000)),
-    ("$3,000 - $5,000 over 8 weeks", (3000, 5000)),
-])
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("$6,500 (50% upfront)", (6500, 6500)),
+        ("$4,000 per month for 3 months", (4000, 4000)),
+        ("$3,000 - $5,000 over 8 weeks", (3000, 5000)),
+    ],
+)
 def test_parse_money_ignores_non_money_numbers(text, expected):
     assert gen.parse_money(text)[:2] == expected
 
 
-@pytest.mark.parametrize("low,high,expected", [
-    (float("nan"), float("nan"), (0, 0)),
-    (500, float("nan"), (500, 500)),
-    (float("nan"), 700, (700, 700)),
-    (900, 400, (900, 900)),
-    (None, None, (0, 0)),
-])
+@pytest.mark.parametrize(
+    "low,high,expected",
+    [
+        (float("nan"), float("nan"), (0, 0)),
+        (500, float("nan"), (500, 500)),
+        (float("nan"), 700, (700, 700)),
+        (900, 400, (900, 900)),
+        (None, None, (0, 0)),
+    ],
+)
 def test_clean_amounts(low, high, expected):
     assert gen.clean_amounts(low, high) == expected
 
@@ -149,6 +180,7 @@ def test_summary_keeps_proper_nouns():
 
 def _app():
     from streamlit.testing.v1 import AppTest
+
     return AppTest.from_file(str(Path(__file__).resolve().parent.parent / "app.py"), default_timeout=60).run()
 
 
@@ -199,11 +231,13 @@ def test_pdf_reports_missing_browser(monkeypatch):
 
 
 @pytest.mark.skipif(pdf_export.find_browser() is None, reason="needs Chrome or Edge")
-def test_pdf_is_created_with_one_page_per_section():
+def test_pdf_is_created_with_one_page_per_sheet():
     p = gen.build_proposal(SAMPLES[next(iter(SAMPLES))], TODAY)
     data = pdf_export.html_to_pdf(render.render_html(p))
     assert data.startswith(b"%PDF-")
-    assert len(re.findall(rb"/Type\s*/Page[^s]", data)) == 6
+    assert (
+        len(re.findall(rb"/Type\s*/Page[^s]", data)) == 7
+    )  # cover + Summary, Scope, Timeline, Investment, Terms, Accept
 
 
 def test_no_eyebrow_labels_in_html():

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>The Tabbed Dossier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--board:#1B2A6B;--gold:#C9A24B;--paper:#FBFBF8;--ink:#12131A}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{position:relative;background:var(--paper);font-family:'Hanken Grotesk',sans-serif;color:var(--ink)}
+/* leaf of bond stock peeking behind the board, with a faint edge of stacked pages */
+.leaf{position:absolute;left:1180px;top:48px;width:200px;height:812px;background:var(--paper);border:1px solid #d9d9d2;border-left:0;box-shadow:6px 0 0 -1px #f0f0ea,7px 0 0 #d9d9d2,13px 0 0 -1px #f0f0ea,14px 0 0 #d9d9d2}
+.board{position:absolute;left:40px;top:40px;width:1160px;height:820px;background-color:var(--board);
+ background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(0,0,0,.09) 0 1px,transparent 1px 3px);
+ border-radius:6px 2px 2px 6px;box-shadow:0 18px 36px -18px rgba(18,19,26,.55)}
+/* spine groove + gold foil frame */
+.board::before{content:"";position:absolute;left:44px;top:0;bottom:0;width:3px;background:rgba(0,0,0,.28);box-shadow:2px 0 0 rgba(255,255,255,.07)}
+.frame{position:absolute;left:96px;right:48px;top:48px;bottom:48px;border:1.5px solid var(--gold);opacity:.8}
+.frame::after{content:"";position:absolute;inset:6px;border:1px solid rgba(201,162,75,.4)}
+.cover{position:absolute;left:140px;right:96px;top:96px;bottom:96px}
+.kicker{font-size:15px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.name{margin-top:92px;font-family:'Familjen Grotesk',sans-serif;font-weight:700;font-size:142px;line-height:.9;letter-spacing:-.035em;color:#fff}
+.title{margin-top:44px;font-family:'Familjen Grotesk',sans-serif;font-weight:500;font-size:46px;letter-spacing:-.01em;color:var(--gold);
+ text-shadow:0 1px 0 rgba(255,236,170,.35)}
+.rule{width:96px;height:3px;background:var(--gold);margin-top:34px}
+.goals{position:absolute;left:0;top:508px;width:520px;font-size:17px;line-height:1.5;color:rgba(255,255,255,.82)}
+.goals b{display:block;font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.goals li{list-style:none;padding-left:18px;position:relative;margin-bottom:4px}
+.goals li::before{content:"";position:absolute;left:0;top:.62em;width:7px;height:2px;background:var(--gold)}
+.facts{position:absolute;right:0;top:508px;text-align:right}
+.facts div{font-family:'Familjen Grotesk',sans-serif;font-size:34px;font-weight:500;color:#fff;letter-spacing:-.01em}
+.facts small{display:block;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:2px}
+.meta{position:absolute;left:0;bottom:0;display:flex;gap:56px}
+.meta span{display:block;font-size:11.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.meta p{font-size:17px;font-weight:500;color:#fff;letter-spacing:.02em}
+/* index tabs stand out of the right edge */
+.tabs{position:absolute;left:1200px;top:72px}
+.tab{position:relative;display:flex;align-items:center;gap:14px;height:104px;width:176px;margin-bottom:12px;padding:0 18px 0 16px;
+ border-radius:0 12px 12px 0;color:#fff;font-weight:600;font-size:16px;letter-spacing:.14em;text-transform:uppercase;box-shadow:3px 3px 0 rgba(18,19,26,.16)}
+.tab i{font-style:normal;font-family:'Familjen Grotesk',sans-serif;font-weight:700;font-size:34px;letter-spacing:0;line-height:1;opacity:.95}
+.t1{background:#E2452B;width:216px;margin-left:-6px;box-shadow:5px 5px 0 rgba(18,19,26,.22);height:112px;
+ clip-path:polygon(0 0,calc(100% - 34px) 0,100% 34px,100% 100%,0 100%)}
+.t1::after{content:"";position:absolute;right:0;top:0;width:34px;height:34px;background:linear-gradient(225deg,transparent 50%,#a82a14 50%)}
+.t2{background:#F2B01E;color:var(--ink)}
+.t3{background:#0E9F6E}
+.t4{background:#2D5BFF}
+.t5{background:#7A2E8E}
+.t6{background:#E2452B;filter:hue-rotate(0deg)}
+.t6{background:#12131A;color:#fff}
+.foot{position:absolute;left:1236px;bottom:34px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#6b6c75}
+</style></head>
+<body>
+<div class="leaf"></div>
+<div class="board">
+  <div class="frame"></div>
+  <div class="cover">
+    <div class="kicker">Proposal &amp; Scope of Work</div>
+    <h1 class="name">Bright Dental<br>Clinic</h1>
+    <div class="title">Website Redesign Proposal</div>
+    <div class="rule"></div>
+    <div class="goals"><b>Goals</b><ul>
+      <li>Increase online appointment bookings by 30%</li>
+      <li>Modernise the clinic's look and build patient trust</li></ul></div>
+    <div class="facts"><small>Timeline</small><div>8 weeks</div><small style="margin-top:18px">Investment</small><div>$6,500 &ndash; $8,000</div></div>
+    <div class="meta">
+      <div><span>Prepared by</span><p>Allure Digital</p></div>
+      <div><span>Date</span><p>4 November 2026</p></div>
+      <div><span>Valid until</span><p>4 December 2026</p></div>
+    </div>
+  </div>
+</div>
+<div class="tabs">
+  <div class="tab t1"><i>1</i>Summary</div>
+  <div class="tab t2"><i>2</i>Scope</div>
+  <div class="tab t3"><i>3</i>Timeline</div>
+  <div class="tab t4"><i>4</i>Investment</div>
+  <div class="tab t5"><i>5</i>Terms</div>
+  <div class="tab t6"><i>6</i>Accept</div>
+</div>
+</body></html>

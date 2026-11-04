@@ -2,3 +2,10 @@
 __pycache__/
 .pytest_cache/
 *.pyc
+
+logs/
+.coverage
+coverage.xml
+.mypy_cache/
+.ruff_cache/
+.env

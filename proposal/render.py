@@ -1,4 +1,5 @@
 """Render a proposal dict to a standalone HTML presentation document."""
+
 from __future__ import annotations
 
 import math
@@ -7,7 +8,8 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from .generator import clean_amounts, money, price_range_text, price_text, pricing_totals
+from .generator import clean_amounts, money, price_range_text, price_text, pricing_totals, project_kind
+from .imagery import hero_data_uri
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 
@@ -40,8 +42,16 @@ def gantt(p: dict) -> dict:
     return {
         "n": n,
         "labels": [{"week": w, "show": (w - 1) % every == 0} for w in range(1, n + 1)],
-        "rows": [{**m, "col_start": int(m["start"]), "col_end": int(m["end"]) + 1,
-                  "label": week_label(m), "short": short_week_label(m)} for m in p["milestones"]],
+        "rows": [
+            {
+                **m,
+                "col_start": int(m["start"]),
+                "col_end": int(m["end"]) + 1,
+                "label": week_label(m),
+                "short": short_week_label(m),
+            }
+            for m in p["milestones"]
+        ],
     }
 
 
@@ -60,7 +70,9 @@ def render_html(p: dict, *, editable: bool = False) -> str:
         gantt=gantt(p),
         price_total=price_text(p),
         has_price=high > 0,
-        range_prices=any(round(lo) != round(hi) for lo, hi in
-                         (clean_amounts(i["low"], i["high"]) for i in p["price_items"])),
+        range_prices=any(
+            round(lo) != round(hi) for lo, hi in (clean_amounts(i["low"], i["high"]) for i in p["price_items"])
+        ),
         file_stem=filename_stem(p),
+        hero_image=hero_data_uri(project_kind(p.get("project_type", ""))),
     )

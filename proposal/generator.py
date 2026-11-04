@@ -4,6 +4,7 @@ Everything here is template based, so it works offline with no API key.
 The dict it returns is what the editor, the HTML template and the DOCX
 exporter all share.
 """
+
 from __future__ import annotations
 
 import json
@@ -11,6 +12,9 @@ import math
 import re
 from datetime import date, timedelta
 from pathlib import Path
+
+from .limits import MAX_AMOUNT, MAX_ITEM_CHARS, MAX_LIST_ITEMS, MAX_NAME_CHARS, MAX_WEEKS, clamp, clean_text
+from .quotes import pick_quote
 
 SAMPLES_DIR = Path(__file__).resolve().parent.parent / "samples"
 
@@ -134,13 +138,15 @@ NEXT_STEPS = [
 
 _SYMBOL_BY_CODE = {"usd": "$", "gbp": "£", "eur": "€", "inr": "₹"}
 _NOT_MONEY_RE = re.compile(
-    r"\s*(?:%|(?:percent|months?|weeks?|days?|years?|yrs?|hours?|hrs?|pages?|phases?|payments?|installments?)\b)", re.I)
+    r"\s*(?:%|(?:percent|months?|weeks?|days?|years?|yrs?|hours?|hrs?|pages?|phases?|payments?|installments?)\b)", re.I
+)
 _NUMBER_RE = re.compile(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?")
 _BULLET_RE = re.compile(r"^\s*(?:[-*•–]|\d+[.)])\s*")
 _LABEL_RE = re.compile(r"^\s*([A-Za-z][A-Za-z ]{1,24}?)\s*[:=]\s*(.*)$")
 
 
 # ---------------------------------------------------------------- parsing
+
 
 def to_list(value, split_commas: bool = False) -> list[str]:
     """Split text (or a list) into clean items. Bullets and numbering are removed."""
@@ -151,8 +157,8 @@ def to_list(value, split_commas: bool = False) -> list[str]:
         if len(raw) == 1:
             pattern = r"\s*[;,]\s*" if split_commas else r"\s*;\s*"
             raw = re.split(pattern, raw[0])
-    items = (_BULLET_RE.sub("", r).strip() for r in raw)
-    return [i for i in items if i]
+    items = (clean_text(_BULLET_RE.sub("", r), MAX_ITEM_CHARS) for r in raw)
+    return [i for i in items if i][:MAX_LIST_ITEMS]
 
 
 def parse_freeform(text: str) -> dict[str, str]:
@@ -162,7 +168,7 @@ def parse_freeform(text: str) -> dict[str, str]:
     for line in str(text or "").splitlines():
         match = _LABEL_RE.match(line)
         field = _field_for(match.group(1)) if match else None
-        if field:
+        if match and field:
             current = field
             rest = match.group(2).strip()
             if rest:
@@ -196,8 +202,11 @@ def to_freeform(inputs: dict) -> str:
     return "\n".join(lines)
 
 
-def parse_money(text: str) -> tuple[float, float, str]:
-    """Return (low, high, currency symbol). Handles '$4,000', '3k-5k', '£2,500 to £3,500'."""
+def parse_money(text: str, cap: bool = True) -> tuple[float, float, str]:
+    """Return (low, high, currency symbol). Handles '$4,000', '3k-5k', '£2,500 to £3,500'.
+
+    Amounts above MAX_AMOUNT are lowered to it, unless cap=False (used only to detect that).
+    """
     text = str(text or "")
     currency = "$"
     for symbol in "$£€₹":
@@ -215,12 +224,15 @@ def parse_money(text: str) -> tuple[float, float, str]:
         if _NOT_MONEY_RE.match(text, m.end()):
             continue
         number = float(m.group(0).replace(",", ""))
-        if text[m.end():m.end() + 1].lower() == "k":
+        if text[m.end() : m.end() + 1].lower() == "k":
             number *= 1000
         values.append(number)
     if not values:
         return 0.0, 0.0, currency
-    return min(values[:2]), max(values[:2]), currency
+    low, high = min(values[:2]), max(values[:2])
+    if cap:
+        low, high = min(low, MAX_AMOUNT), min(high, MAX_AMOUNT)
+    return low, high, currency
 
 
 def _amount(value) -> float | None:
@@ -229,13 +241,14 @@ def _amount(value) -> float | None:
 
 
 def clean_amounts(low, high) -> tuple[float, float]:
-    """Make an editable price row safe: blank cells become 0, or copy the other end."""
+    """Make an editable price row safe: blank cells become 0 or copy the other end, and the
+    numbers are kept between 0 and MAX_AMOUNT (no negative, infinite or absurd prices)."""
     low, high = _amount(low), _amount(high)
     if low is None and high is None:
         return 0.0, 0.0
     low = high if low is None else low
     high = low if high is None else max(high, low)
-    return low, high
+    return clamp(low, 0.0, MAX_AMOUNT), clamp(high, 0.0, MAX_AMOUNT)
 
 
 def price_range_text(low, high, currency: str) -> str:
@@ -246,7 +259,7 @@ def price_range_text(low, high, currency: str) -> str:
     return f"{money(low, currency)} – {money(high, currency)}"
 
 
-def parse_weeks(text: str, default: int = 6) -> int:
+def parse_weeks(text: str, default: int = 6, cap: bool = True) -> int:
     """'8 weeks' -> 8, '2 months' -> 9, '30 days' -> 5. Falls back to a default."""
     m = re.search(r"(\d+(?:\.\d+)?)\s*(day|week|wk|month|mo)", str(text or ""), re.I)
     if not m:
@@ -258,7 +271,7 @@ def parse_weeks(text: str, default: int = 6) -> int:
         weeks = math.ceil(n)
     else:
         weeks = math.ceil(n * 4.3)
-    return max(1, weeks)
+    return max(1, min(weeks, MAX_WEEKS) if cap else weeks)
 
 
 def money(value: float, currency: str = "$") -> str:
@@ -266,6 +279,7 @@ def money(value: float, currency: str = "$") -> str:
 
 
 # ---------------------------------------------------------------- building
+
 
 def project_kind(project_type: str) -> str:
     text = str(project_type or "").lower()
@@ -292,13 +306,13 @@ def build_milestones(kind: str, weeks: int) -> tuple[list[dict], list[float]]:
     if weeks < len(phases):
         keep = max(weeks - 1, 0)
         tail = phases[keep:]
-        phases = phases[:keep] + [("Build & Delivery", sum(p[1] for p in tail),
-                                   "Build, review and hand over the finished work.")]
+        phases = phases[:keep] + [
+            ("Build & Delivery", sum(p[1] for p in tail), "Build, review and hand over the finished work.")
+        ]
     lengths = _allocate_weeks(weeks, [p[1] for p in phases])
     milestones, cursor = [], 1
-    for (name, _, description), length in zip(phases, lengths):
-        milestones.append({"phase": name, "start": cursor, "end": cursor + length - 1,
-                           "description": description})
+    for (name, _, description), length in zip(phases, lengths, strict=True):
+        milestones.append({"phase": name, "start": cursor, "end": cursor + length - 1, "description": description})
         cursor += length
     return milestones, [p[1] for p in phases]
 
@@ -309,7 +323,7 @@ def build_price_items(milestones: list[dict], weights: list[float], low: float, 
         return []
     step = 10 if high >= 1000 else 1
     items, used_low, used_high = [], 0.0, 0.0
-    for i, (m, w) in enumerate(zip(milestones, weights)):
+    for i, (m, w) in enumerate(zip(milestones, weights, strict=True)):
         last = i == len(milestones) - 1
         lo = low - used_low if last else round(low * w / step) * step
         hi = high - used_high if last else round(high * w / step) * step
@@ -332,13 +346,6 @@ def _lower_words(text: str) -> str:
     return " ".join(w.lower() if w.istitle() else w for w in text.split())
 
 
-def _join(items: list[str]) -> str:
-    items = [i.rstrip(".") for i in items]
-    if len(items) <= 1:
-        return "".join(items)
-    return ", ".join(items[:-1]) + " and " + items[-1]
-
-
 def pricing_totals(p: dict) -> tuple[float, float]:
     amounts = [clean_amounts(i.get("low"), i.get("high")) for i in p["price_items"]]
     return sum(a[0] for a in amounts), sum(a[1] for a in amounts)
@@ -351,16 +358,16 @@ def price_text(p: dict) -> str:
 
 def build_proposal(inputs: dict, today: date | None = None) -> dict:
     today = today or date.today()
-    client = (inputs.get("client_name") or "").strip() or "Your Client"
-    ptype = (inputs.get("project_type") or "").strip() or "Project"
-    by = (inputs.get("prepared_by") or "").strip() or "Our team"
+    client = clean_text(inputs.get("client_name"), MAX_NAME_CHARS) or "Your Client"
+    ptype = clean_text(inputs.get("project_type"), MAX_NAME_CHARS) or "Project"
+    by = clean_text(inputs.get("prepared_by"), MAX_NAME_CHARS) or "Our team"
     goals = to_list(inputs.get("goals"))
     deliverables = to_list(inputs.get("deliverables"), split_commas=True)
     notes = to_list(inputs.get("notes"))
 
     kind = project_kind(ptype)
-    weeks = parse_weeks(inputs.get("timeline"))
-    low, high, currency = parse_money(inputs.get("pricing"))
+    weeks = parse_weeks(str(inputs.get("timeline") or ""))
+    low, high, currency = parse_money(str(inputs.get("pricing") or ""))
     milestones, weights = build_milestones(kind, weeks)
 
     p = {
@@ -381,24 +388,29 @@ def build_proposal(inputs: dict, today: date | None = None) -> dict:
         "payment_terms": list(PAYMENT_TERMS) if high > 0 else [],
         "notes": notes,
         "next_steps": list(NEXT_STEPS),
+        "quote": pick_quote(kind, f"{client}|{ptype}"),
     }
     p["summary"] = _summary(p, weeks)
     return p
 
 
 def _summary(p: dict, weeks: int) -> str:
-    parts = [f"{p['prepared_by']} will plan, build and deliver a {_lower_words(p['project_type'])} "
-             f"for {p['client']} over {weeks} week{'s' if weeks != 1 else ''}."]
-    if p["goals"]:
-        parts.append(f"The key goals are to {_join([_lower_first(g) for g in p['goals'][:3]])}.")
-    if p["deliverables"]:
-        n = len(p["deliverables"])
-        parts.append(f"The work covers {n} key deliverable{'s' if n != 1 else ''}, "
-                     f"including {_join([_lower_first(d) for d in p['deliverables'][:2]])}.")
-    if pricing_totals(p)[1] > 0:
-        parts.append(f"The estimated investment is {price_text(p)}.")
-    parts.append("This document sets out the scope, timeline and pricing so both sides "
-                 "agree on the work before it starts.")
+    """Two or three plain sentences. The goals, price and dates are shown elsewhere on the page,
+    so the summary does not repeat them."""
+    plural = "s" if weeks != 1 else ""
+    parts = [
+        f"{p['prepared_by']} will deliver the {_lower_words(p['project_type'])} for {p['client']} in {weeks} week{plural}."
+    ]
+    phases, count = p["milestones"], len(p["deliverables"])
+    covers = f"covers {count} deliverable{'s' if count != 1 else ''}" if count else ""
+    if len(phases) > 1:
+        runs = f"The work runs in {len(phases)} phases, from {phases[0]['phase']} to {phases[-1]['phase']}"
+        parts.append(f"{runs}, and {covers}." if covers else f"{runs}.")
+    elif covers:
+        parts.append(f"The work {covers}.")
+    parts.append(
+        "This document sets out the scope, timeline and pricing so both sides agree on the work before it starts."
+    )
     return " ".join(parts)
 
 
